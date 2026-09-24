@@ -84,6 +84,10 @@ namespace Vanta.EditorTools
             world.AddComponent<WeatherSystem>();
             world.AddComponent<WorldEventDirector>();
             world.AddComponent<WorldEventSystem>();
+            world.AddComponent<DistrictRuntimeSystem>();
+            world.AddComponent<ActivitySystem>();
+            world.AddComponent<InteractionSystem>();
+            world.AddComponent<DialogueSystem>();
             world.AddComponent<DiscoverySystem>();
             world.AddComponent<ScoutingSystem>();
             world.AddComponent<IntelMapSystem>();
@@ -103,6 +107,19 @@ namespace Vanta.EditorTools
             world.AddComponent<MissionSystem>();
             world.AddComponent<MissionConsequenceSystem>();
             world.AddComponent<SaveSystem>();
+            var coordinator = world.AddComponent<GameWorldCoordinator>();
+            var coordinatorSo = new SerializedObject(coordinator);
+            coordinatorSo.FindProperty("wanted").objectReferenceValue = world.GetComponent<WantedSystem>();
+            coordinatorSo.FindProperty("policeEscalation").objectReferenceValue = world.GetComponent<PoliceEscalationSystem>();
+            coordinatorSo.FindProperty("pursuit").objectReferenceValue = world.GetComponent<PolicePursuitCoordinator>();
+            coordinatorSo.FindProperty("missions").objectReferenceValue = world.GetComponent<MissionSystem>();
+            coordinatorSo.FindProperty("consequences").objectReferenceValue = world.GetComponent<MissionConsequenceSystem>();
+            coordinatorSo.FindProperty("factions").objectReferenceValue = world.GetComponent<FactionSystem>();
+            coordinatorSo.FindProperty("territories").objectReferenceValue = world.GetComponent<FactionTerritorySystem>();
+            coordinatorSo.FindProperty("economy").objectReferenceValue = world.GetComponent<EconomySystem>();
+            coordinatorSo.FindProperty("progression").objectReferenceValue = world.GetComponent<ProgressionSystem>();
+            coordinatorSo.FindProperty("intel").objectReferenceValue = world.GetComponent<IntelMapSystem>();
+            coordinatorSo.ApplyModifiedPropertiesWithoutUndo();
             world.AddComponent<GameSession>();
 
             var player = CreatePlayer();
