@@ -2,15 +2,17 @@
 
 ## Repository checkpoint
 - Default branch: `main`
-- Active implementation branch: `dev/core-gameplay-foundation`
+- Authoritative branch: `main`
 - Unity: 2022.3.62f1
-- `main` remains untouched.
+- All new implementation work in this phase is committed directly to `main`.
 - Latest source checkpoint: gameplay-state, combat/vehicle state integration, mission persistence, and persistent-world serialization hardening.
 
-## Current phase — performance/runtime-readiness hardening
-- `PerformanceBudgetSystem` now applies its configured `Application.targetFrameRate` target when enabled.
-- Added deterministic traffic/civilian spawn-budget queries (`CanSpawnTraffic`, `CanSpawnCivilian`) for population systems to consume without exceeding configured caps.
-- Added regression coverage for population budget boundaries and invalid target-frame-rate clamping.
+## Current phase — population-budget and district-streaming integration
+- `PerformanceBudgetSystem` now exposes a reusable `PerformanceBudgetPolicy` and applies its configured `Application.targetFrameRate` target when enabled.
+- `TrafficPopulationSystem` now consumes the central traffic budget before spawning.
+- Added `CivilianPopulationSystem` with the same deterministic budget contract.
+- `DistrictStreamingSystem` now supports configured district-to-scene mappings and additive `SceneManager.LoadSceneAsync` / unload lifecycle callbacks, while retaining deterministic state transitions for tests.
+- Added regression coverage for shared population budgets and district lifecycle guards.
 - Unity runtime execution remains explicitly unverified in this environment.
 
 ## Source implementation completed in this wave
@@ -45,7 +47,7 @@
 - Source-side streaming/performance foundations
 
 ## Verification truth
-- Source edits: IMPLEMENTED on the active development branch.
+- Source edits: IMPLEMENTED directly on `main`.
 - Regression tests authored: IMPLEMENTED.
 - Unity Editor import/compile: UNVERIFIED.
 - Unity EditMode test execution: UNVERIFIED; Unity Editor/Test Runner is unavailable in this execution environment.
