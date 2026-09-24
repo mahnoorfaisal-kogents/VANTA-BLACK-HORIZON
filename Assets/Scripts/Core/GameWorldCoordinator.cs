@@ -1,6 +1,7 @@
 using UnityEngine;
 using Vanta.AI;
 using Vanta.Missions;
+using Vanta.Map;
 using Vanta.Systems;
 using Vanta.World;
 
