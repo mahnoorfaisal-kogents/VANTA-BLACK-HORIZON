@@ -63,6 +63,10 @@ namespace Vanta.AI
             var context = new AgentContextSnapshot(++tick, threat, curiosity, socialNeed,
                 hasTarget, playerVisible, true);
             var action = orchestrator.Tick(context);
+            if (playerVisible && player)
+                orchestrator.Knowledge.AddFact("last_known_player", player.position.ToString(), 0.9f);
+            else if (hasTarget)
+                orchestrator.Knowledge.AddFact("player_lost", "target not currently visible", 0.7f);
             telemetry.Record(new AgentDecisionTrace(tick, action, threat));
         }
     }
