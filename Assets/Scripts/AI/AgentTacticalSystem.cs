@@ -60,7 +60,7 @@ namespace Vanta.AI
             if (!context.Alive)
                 return new AgentTacticalResult(AgentTacticalGoal.Survive, AgentAction.Idle, 1f);
 
-            var survive = context.Threat;
+            var survive = Mathf.Clamp01(context.Threat * 1.1f);
             var pursue = context.TargetVisible && context.HasTarget ? context.Visibility * 0.8f + context.Threat * 0.2f : 0f;
             var investigate = context.HasTarget && !context.TargetVisible
                 ? context.Visibility * 0.55f + (1f - context.Threat) * 0.45f
