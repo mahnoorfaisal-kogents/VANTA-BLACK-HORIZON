@@ -117,4 +117,31 @@ public sealed class AdvancedAIAgentSystemTests
         Assert.LessOrEqual(first.GoalUtility, 1f);
     }
 
+    [Test]
+    public void AIDirectorCalculatesTierAndEmitsContextualEventDeterministically()
+    {
+        var director = new AIDirectorModel(77);
+        var result = director.Evaluate(0.9f, 0.8f, 0.6f);
+
+        Assert.GreaterOrEqual(result.Pressure, 0f);
+        Assert.LessOrEqual(result.Pressure, 1f);
+        Assert.AreEqual(3, result.EventTier);
+        Assert.AreEqual(result.EventTier, director.Evaluate(0.9f, 0.8f, 0.6f).EventTier);
+    }
+
+    [Test]
+    public void SquadCoordinatorAssignsDistinctDeterministicRoles()
+    {
+        var coordinator = new AgentSquadCoordinator(4);
+        coordinator.Add(1, 0.9f);
+        coordinator.Add(2, 0.7f);
+        coordinator.Add(3, 0.5f);
+
+        var assignments = coordinator.BuildAssignments();
+
+        Assert.AreEqual(SquadRole.Leader, assignments[0].Role);
+        Assert.AreEqual(SquadRole.Assault, assignments[1].Role);
+        Assert.AreEqual(SquadRole.Support, assignments[2].Role);
+    }
+
 }
