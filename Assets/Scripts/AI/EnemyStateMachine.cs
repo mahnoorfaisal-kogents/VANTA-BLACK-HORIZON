@@ -18,8 +18,8 @@ namespace Vanta.AI
 
             var allowed = Current switch
             {
-                EnemyState.Idle => next == EnemyState.Wander || next == EnemyState.Investigate || next == EnemyState.Alert || next == EnemyState.Combat,
-                EnemyState.Wander => next == EnemyState.Investigate || next == EnemyState.Alert || next == EnemyState.Combat || next == EnemyState.Idle,
+                EnemyState.Idle => next == EnemyState.Wander || next == EnemyState.Investigate || next == EnemyState.Alert || next == EnemyState.Combat || next == EnemyState.Chase,
+                EnemyState.Wander => next == EnemyState.Investigate || next == EnemyState.Alert || next == EnemyState.Combat || next == EnemyState.Chase || next == EnemyState.Idle,
                 EnemyState.Investigate => next == EnemyState.Alert || next == EnemyState.Combat || next == EnemyState.Search || next == EnemyState.ReturnToNormal,
                 EnemyState.Alert => next == EnemyState.Combat || next == EnemyState.Chase || next == EnemyState.Search || next == EnemyState.ReturnToNormal,
                 EnemyState.Combat => next == EnemyState.Chase || next == EnemyState.Search || next == EnemyState.Flee,
