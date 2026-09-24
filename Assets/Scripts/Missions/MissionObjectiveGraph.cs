@@ -24,19 +24,39 @@ namespace Vanta.Missions
 
         public void Build(IEnumerable<MissionObjectiveNode> source)
         {
+            TryBuild(source);
+        }
+
+        public bool TryBuild(IEnumerable<MissionObjectiveNode> source)
+        {
             nodes.Clear();
             foreach (var node in source ?? Array.Empty<MissionObjectiveNode>())
             {
-                if (node == null || string.IsNullOrWhiteSpace(node.id)) continue;
-                nodes[node.id] = new MissionObjectiveNode
+                if (node == null || string.IsNullOrWhiteSpace(node.id) || nodes.ContainsKey(node.id))
                 {
-                    id = node.id, title = node.title,
+                    nodes.Clear();
+                    return false;
+                }
+
+                nodes.Add(node.id, new MissionObjectiveNode
+                {
+                    id = node.id,
+                    title = node.title,
                     prerequisites = node.prerequisites == null ? Array.Empty<string>() : (string[])node.prerequisites.Clone(),
                     approaches = node.approaches == null ? Array.Empty<string>() : (string[])node.approaches.Clone(),
-                    status = ObjectiveStatus.Locked, Optional = node.Optional
-                };
+                    status = ObjectiveStatus.Locked,
+                    Optional = node.Optional
+                });
             }
+
+            if (!HasValidPrerequisites() || HasCycle())
+            {
+                nodes.Clear();
+                return false;
+            }
+
             RefreshAvailability();
+            return true;
         }
 
         public bool SetActive(string id) =>
@@ -67,7 +87,7 @@ namespace Vanta.Missions
 
         public bool ArePrerequisitesComplete(MissionObjectiveNode node)
         {
-            if (node.prerequisites == null || node.prerequisites.Length == 0) return true;
+            if (node == null || node.prerequisites == null || node.prerequisites.Length == 0) return true;
             foreach (var prerequisite in node.prerequisites)
                 if (!nodes.TryGetValue(prerequisite, out var dependency) || dependency.status != ObjectiveStatus.Complete)
                     return false;
@@ -85,8 +105,53 @@ namespace Vanta.Missions
         public void RestoreStatuses(IEnumerable<MissionObjectiveSaveState> states)
         {
             foreach (var state in states ?? Array.Empty<MissionObjectiveSaveState>())
-                if (state != null && nodes.TryGetValue(state.id, out var node))
-                    node.status = (ObjectiveStatus)Mathf.Clamp(state.status, (int)ObjectiveStatus.Locked, (int)ObjectiveStatus.Failed);
+            {
+                if (state == null || !nodes.TryGetValue(state.id, out var node)) continue;
+                node.status = (ObjectiveStatus)Mathf.Clamp(state.status, (int)ObjectiveStatus.Locked, (int)ObjectiveStatus.Failed);
+            }
+
+            NormalizeRestoredStatuses();
+        }
+
+        void NormalizeRestoredStatuses()
+        {
+            // A save may not activate or complete an objective whose prerequisites are not complete.
+            // Preserve completed/failed facts, but safely downgrade contradictory active/available state.
+            foreach (var node in nodes.Values)
+            {
+                if ((node.status == ObjectiveStatus.Active || node.status == ObjectiveStatus.Available) && !ArePrerequisitesComplete(node))
+                    node.status = ObjectiveStatus.Locked;
+            }
+            RefreshAvailability();
+        }
+
+        bool HasValidPrerequisites()
+        {
+            foreach (var node in nodes.Values)
+                foreach (var prerequisite in node.prerequisites ?? Array.Empty<string>())
+                    if (string.IsNullOrWhiteSpace(prerequisite) || !nodes.ContainsKey(prerequisite) || prerequisite == node.id)
+                        return false;
+            return true;
+        }
+
+        bool HasCycle()
+        {
+            var visiting = new HashSet<string>();
+            var visited = new HashSet<string>();
+            foreach (var id in nodes.Keys)
+                if (HasCycle(id, visiting, visited)) return true;
+            return false;
+        }
+
+        bool HasCycle(string id, HashSet<string> visiting, HashSet<string> visited)
+        {
+            if (visited.Contains(id)) return false;
+            if (!visiting.Add(id)) return true;
+            foreach (var prerequisite in nodes[id].prerequisites ?? Array.Empty<string>())
+                if (HasCycle(prerequisite, visiting, visited)) return true;
+            visiting.Remove(id);
+            visited.Add(id);
+            return false;
         }
 
         void RefreshAvailability()
