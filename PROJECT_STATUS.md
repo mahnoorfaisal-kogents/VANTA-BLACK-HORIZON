@@ -1,104 +1,61 @@
 # VANTA: BLACK HORIZON — Development Status
 
 ## Repository checkpoint
-- Default branch: main
-- Active implementation branch: dev/core-gameplay-foundation
+- Default branch: `main`
+- Active implementation branch: `dev/core-gameplay-foundation`
 - Unity: 2022.3.62f1
-- main remains untouched by implementation work.
-- Source-level implementation has expanded substantially; Unity Editor/Play Mode/build execution is still required for runtime verification.
+- `main` remains untouched.
+- Current source checkpoint includes the original systemic gameplay wave plus the next source-only integration wave.
 
-## Research and architecture
-Gameplay-system comparison is documented in `Docs/GAMEPLAY_REFERENCE_COMPARISON.md`. Reference categories were taken from representative published open-world/action games; VANTA content remains original.
+## Source-only systems implemented
+- Mission consequence data is attached to mission definitions and consumed on mission completion.
+- `GameWorldCoordinator` connects mission rewards to economy, progression, faction reputation, territory influence, wanted heat and intel reveals.
+- Wanted changes drive police escalation and pursuit state.
+- Activity lifecycle: Locked -> Available -> Active -> Complete/Failed.
+- Runtime district registry with unlock and active-district state.
+- Interaction registry with deterministic interaction dispatch.
+- Branching dialogue runtime with reputation-gated choices.
+- End-to-end save orchestration for player transform, cash, wanted heat, XP, world time and active mission identity.
+- Save-slot path sanitization and guarded file IO.
+- Load hooks added to economy, progression and world time.
+- Generated vertical slice now wires the coordinator, save coordinator and the new systemic services.
+- Deterministic regression coverage added for the new activity/district/dialogue/interaction/save behavior.
 
-## Implemented foundations
+## Existing systemic foundation retained
+- Mission objective graph + runtime asset isolation
+- Dynamic world events
+- Faction territory + world effects
+- Traffic routes/population
+- NPC schedules
+- Safehouse/garage services
+- Intel map
+- Progression/XP
+- Police escalation + pursuit coordination
+- Persistent world snapshot foundation
+- NavMeshSurface wiring in the editor vertical-slice generator
 
-### Playable vertical-slice generation
-- Editor command `VANTA/Build Playable Vertical Slice`
-- Generates original `MainMenu` and `PlayableDistrict` scenes under `Assets/Generated`
-- Generates environment materials and five weapon ScriptableObject assets
-- Generates player, camera, enemy, civilians, vehicles, HUD and world-system wiring
-- Configures Unity Build Settings with both generated scenes
-
-### Core
-- Health/armor/death contract
-- Gameplay session states
-- Movement math tests
-- Camera-relative movement
-- Sprint/stamina
-- Crouch
-- Jump/gravity
-- Third-person camera follow/look
-- Aim/FOV
-- Camera collision
-- Camera binding
-
-### Combat/AI
-- Data-driven weapon definitions
-- Pistol/SMG/Assault Rifle/Shotgun/Precision Rifle taxonomy
-- Hitscan damage
-- Spread/pellets
-- Magazine/reload
-- Enemy detection/chase/combat/death
-- Civilian wander/flee/recover foundation
-- Wanted/heat 0–5 foundation
-- Police chase foundation
-- Stealth visibility foundation
-- Parkour/vault foundation
-
-### World/systems
-- World clock + night detection
-- Weather state foundation
-- District definition data
-- Dynamic world-event director
-- World marker taxonomy
-- Inventory
-- Economy/cash
-- Faction reputation/hostility
-- Mission definitions + runtime mission states
-- JSON save/load foundation
-
-### Vehicles
-- Rigidbody vehicle movement foundation
-- Vehicle health
-- Enter/exit interaction foundation
-
-### Tooling
-Unity 2022.3-compatible packages currently include Input System 1.6.1, Cinemachine 2.9.7, AI Navigation 1.1.4 and Animation Rigging 1.2.1.
-
-## Systemic gameplay integration wave
-- Mission consequence model: cash, XP, faction reputation, territory influence, wanted heat and intel reveals.
-- World event lifecycle: Scheduled -> Active -> Resolved/Failed.
-- Faction territory effects: danger multiplier, civilian threat and mission access state.
-- Traffic population capacity/reuse model plus route registry.
-- NPC schedule resolution including overnight schedules.
-- Safehouse/garage service registry.
-- Intel map reveal registry.
-- Progression/XP level system.
-- Wanted-level police escalation and pursuit coordinator.
-- Persistent world snapshot foundation for time, weather, discoveries, missions and territory influence.
-- Vertical-slice generator now wires systemic services and bakes an AI Navigation NavMesh surface during editor generation.
-- Added deterministic integration tests for systemic state transitions.
+## Research wave
+The implementation direction continues to use public system-level references only. Current research emphasizes systemic crowd events, open-world AI scheduling/action planning, dynamic events, runtime navigation, and production AI tooling. VANTA characters, missions, dialogue, world, art, audio and other content remain original.
 
 ## Verification truth
-- Source implementation: completed for the current source-level scope.
-- Deterministic tests: authored, but this environment does not provide a Unity Editor/Test Runner, so test execution is NOT claimed.
-- Unity Play Mode: not executed in this environment.
-- Windows .exe build: not executed in this environment.
-- Runtime-generated scenes: generator updated, but generated scenes/NavMesh still require a real Unity Editor run for final acceptance.
-- main branch: untouched; implementation remains on dev/core-gameplay-foundation.
+- Source edits: IMPLEMENTED on the active development branch.
+- Unity Editor import/compile: UNVERIFIED.
+- Unity EditMode test execution: UNVERIFIED; Unity Editor/Test Runner is unavailable in this execution environment.
+- Unity Play Mode: UNVERIFIED.
+- Generated scene runtime behavior: UNVERIFIED.
+- NavMesh bake/runtime agents: UNVERIFIED.
+- Windows x64 .exe build and launch: UNVERIFIED.
+- Performance profiling/LOD/pooling/streaming: UNVERIFIED.
+- Full authored content pass: NOT COMPLETE.
 
-## Remaining acceptance work
-- Unity Editor import/compile verification
-- Play Mode verification of generated scenes
-- Windows x64 build and launch verification
-- Runtime tuning for NavMesh agents, traffic, NPC schedules, police, vehicles and combat
-- Full content pass: authored districts, missions, dialogue, audio, VFX, animation and art
-- Performance pass: LOD, pooling, culling, profiling and memory budgets
-- UI/HUD/settings polish and accessibility pass
-- End-to-end save/load verification with persistent world state
+## Next acceptance phases
+1. Unity import/compile and execute all deterministic EditMode tests.
+2. Generate the vertical slice in Unity and verify scene references, NavMesh and runtime object wiring.
+3. Verify the combat/AI sandbox end-to-end.
+4. Verify vehicle/traffic/police sandbox.
+5. Verify mission/faction/activity/district/save flows.
+6. Add authored districts, missions, dialogue, audio, VFX, animation and UI polish.
+7. Add performance systems (pooling, LOD, culling, streaming) and profile on target hardware.
+8. Build and launch Windows x64, then run final regression and acceptance.
 
-## Quality gate
-The next acceptance gate is a real playable district:
-Main Menu -> New Game -> Player -> Camera -> Move -> Aim -> Fire -> Enemy Damage -> Enemy Death -> Enemy Attack -> Player Damage -> Player Death -> Restart.
-
-A system is not labeled COMPLETE until source, scene/prefab integration and runtime verification are demonstrated.
+No item above is labeled runtime-complete until execution evidence exists.
