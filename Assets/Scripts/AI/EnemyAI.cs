@@ -1,5 +1,6 @@
 using UnityEngine;
 using Vanta.Core;
+using Vanta.Player;
 
 namespace Vanta.AI
 {
@@ -24,7 +25,7 @@ namespace Vanta.AI
             else State.Transition(EnemyState.Wander);
             if (State.Current == EnemyState.Chase)
             {
-                var direction = (target.position - transform.position); direction.y = 0f;
+                var direction = target.position - transform.position; direction.y = 0f;
                 if (direction.sqrMagnitude > .01f) transform.rotation = Quaternion.LookRotation(direction);
                 transform.position += transform.forward * moveSpeed * Time.deltaTime;
             }
