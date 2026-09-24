@@ -87,6 +87,7 @@ namespace Vanta.EditorTools
             world.AddComponent<DistrictRuntimeSystem>();
             world.AddComponent<DistrictStreamingSystem>();
             world.AddComponent<PerformanceBudgetSystem>();
+            world.AddComponent<VantaSettingsSystem>();
             world.AddComponent<ActivitySystem>();
             world.AddComponent<InteractionSystem>();
             world.AddComponent<DialogueSystem>();
@@ -143,6 +144,12 @@ namespace Vanta.EditorTools
             CreateCivilians();
             CreateVehicles();
             navSurface.BuildNavMesh();
+
+            var pause = new GameObject("PauseController");
+            var pauseController = pause.AddComponent<VantaPauseController>();
+            var pauseSo = new SerializedObject(pauseController);
+            pauseSo.FindProperty("session").objectReferenceValue = world.GetComponent<GameSession>();
+            pauseSo.ApplyModifiedPropertiesWithoutUndo();
 
             var hud = new GameObject("HUD");
             var hudComponent = hud.AddComponent<VantaHud>();
