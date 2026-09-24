@@ -80,12 +80,26 @@ namespace Vanta.EditorTools
             world.AddComponent<WorldTimeSystem>();
             world.AddComponent<WeatherSystem>();
             world.AddComponent<WorldEventDirector>();
+            world.AddComponent<WorldEventSystem>();
             world.AddComponent<DiscoverySystem>();
+            world.AddComponent<ScoutingSystem>();
+            world.AddComponent<IntelMapSystem>();
+            world.AddComponent<PersistentWorldState>();
+            world.AddComponent<TrafficSystem>();
+            world.AddComponent<TrafficPopulationSystem>();
+            world.AddComponent<NPCScheduleSystem>();
             world.AddComponent<WantedSystem>();
+            world.AddComponent<PoliceEscalationSystem>();
+            world.AddComponent<PolicePursuitCoordinator>();
             world.AddComponent<FactionSystem>();
+            world.AddComponent<FactionTerritorySystem>();
+            world.AddComponent<FactionWorldEffects>();
             world.AddComponent<InventorySystem>();
             world.AddComponent<EconomySystem>();
+            world.AddComponent<ProgressionSystem>();
+            world.AddComponent<SafehouseGarageSystem>();
             world.AddComponent<MissionSystem>();
+            world.AddComponent<MissionConsequenceSystem>();
             world.AddComponent<SaveSystem>();
             world.AddComponent<GameSession>();
 
