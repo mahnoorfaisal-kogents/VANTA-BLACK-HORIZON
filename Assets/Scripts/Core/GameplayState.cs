@@ -27,6 +27,12 @@ namespace Vanta.Core
             return true;
         }
 
-        public void Reset() => Current = GameplayState.MainMenu;
+        public void Reset()
+        {
+            if (Current == GameplayState.MainMenu) return;
+            var previous = Current;
+            Current = GameplayState.MainMenu;
+            Changed?.Invoke(previous, Current);
+        }
     }
 }
