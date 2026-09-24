@@ -111,3 +111,13 @@ No runtime-complete or build-complete claim should be made until Unity actually 
 - Added regression coverage for tactical arbitration, AI Director pressure tiers and squad assignments.
 - Source-level AI integration: IMPLEMENTED on main.
 - Unity compile, EditMode execution, Play Mode, NavMesh, and Windows build remain UNVERIFIED.
+
+## Latest consolidated AI phase — squad execution, knowledge propagation, contextual event lifecycle
+- Added deterministic `AgentSquadCommandSystem` with role-aware `Advance`, `Flank`, `Suppress`, `Search`, `Retreat`, and `Regroup` commands.
+- Extended `AgentSquadCoordinator` with command assignments and fixed its missing `Clear()` implementation; the coordinator now respects its configured maximum size.
+- Added `AgentKnowledgePropagationSystem` and `AgentSquadKnowledgeCoordinator` so selected high-value contextual facts can be shared between cooperating `VantaAgentBrain` instances without an external AI service.
+- `VantaAgentBrain` now grounds `last_known_player` / `player_lost` knowledge facts from its own observations.
+- `AIDirector` now retains the active contextual event, emits event lifecycle notifications, and resolves the event after its configured active duration before starting its cooldown.
+- Added EditMode regression coverage for squad command arbitration, leader-missing regroup behavior, knowledge propagation, and coordinator capacity/clear behavior.
+- Source-level implementation for this consolidated AI phase: IMPLEMENTED on `main`.
+- Unity Editor compile, EditMode execution, Play Mode, NavMesh, build, and target-hardware profiling remain UNVERIFIED because no Unity runtime/Editor execution environment was available here.
