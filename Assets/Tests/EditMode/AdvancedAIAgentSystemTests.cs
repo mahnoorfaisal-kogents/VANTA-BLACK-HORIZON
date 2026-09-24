@@ -144,4 +144,55 @@ public sealed class AdvancedAIAgentSystemTests
         Assert.AreEqual(SquadRole.Support, assignments[2].Role);
     }
 
+
+    [Test]
+    public void SquadCommandSystemAssignsRoleSpecificCommands()
+    {
+        var assault = AgentSquadCommandSystem.Evaluate(
+            new SquadCommandContext(SquadRole.Assault, 0.2f, 20f, true, true, true));
+        var support = AgentSquadCommandSystem.Evaluate(
+            new SquadCommandContext(SquadRole.Support, 0.2f, 20f, true, true, true));
+
+        Assert.AreEqual(SquadCommand.Flank, assault.Command);
+        Assert.AreEqual(SquadCommand.Suppress, support.Command);
+    }
+
+    [Test]
+    public void SquadCommandSystemRegroupsWhenLeaderIsMissing()
+    {
+        var result = AgentSquadCommandSystem.Evaluate(
+            new SquadCommandContext(SquadRole.Scout, 0.1f, 40f, false, false, false));
+
+        Assert.AreEqual(SquadCommand.Regroup, result.Command);
+    }
+
+    [Test]
+    public void KnowledgePropagationSharesOnlyKnownFacts()
+    {
+        var source = new AgentKnowledgeBase();
+        var destination = new AgentKnowledgeBase();
+        var propagation = new AgentKnowledgePropagationSystem();
+
+        source.AddFact("last_known_player", "north_docks", 0.9f);
+
+        Assert.IsTrue(propagation.Share(source, destination, "last_known_player"));
+        Assert.IsTrue(destination.TryGetFact("last_known_player", out var value));
+        Assert.AreEqual("north_docks", value);
+        Assert.IsFalse(propagation.Share(source, destination, "unknown"));
+    }
+
+    [Test]
+    public void SquadCoordinatorClearsAndRespectsMaximumSize()
+    {
+        var coordinator = new AgentSquadCoordinator(2);
+        coordinator.Add(1, 0.9f);
+        coordinator.Add(2, 0.8f);
+        coordinator.Add(3, 1f);
+
+        Assert.AreEqual(2, coordinator.Count);
+        coordinator.Clear();
+        Assert.AreEqual(0, coordinator.Count);
+    }
+
+
 }
