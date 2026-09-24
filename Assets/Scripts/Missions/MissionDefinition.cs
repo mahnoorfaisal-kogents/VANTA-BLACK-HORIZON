@@ -1,2 +1,2 @@
 using UnityEngine;
-namespace Vanta.Missions{[CreateAssetMenu(menuName="Vanta/Missions/Mission Definition")]public sealed class MissionDefinition:ScriptableObject{public string missionId;public string title;[TextArea]public string briefing;public int rewardCash;public string[] objectives;}}
+namespace Vanta.Missions{[CreateAssetMenu(menuName="Vanta/Missions/Mission Definition")]public sealed class MissionDefinition:ScriptableObject{public string missionId;public string title;[TextArea]public string briefing;public int rewardCash;public string[] objectives; public MissionObjectiveNode[] objectiveGraph;}}
