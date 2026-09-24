@@ -121,7 +121,7 @@ public sealed class AdvancedAIAgentSystemTests
     public void AIDirectorCalculatesTierAndEmitsContextualEventDeterministically()
     {
         var director = new AIDirectorModel(77);
-        var result = director.Evaluate(0.9f, 0.8f, 0.6f);
+        var result = director.Evaluate(1f, 1f, 1f);
 
         Assert.GreaterOrEqual(result.Pressure, 0f);
         Assert.LessOrEqual(result.Pressure, 1f);
