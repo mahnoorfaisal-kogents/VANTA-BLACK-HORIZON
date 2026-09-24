@@ -87,6 +87,7 @@ namespace Vanta.EditorTools
             world.AddComponent<DistrictRuntimeSystem>();
             world.AddComponent<DistrictStreamingSystem>();
             world.AddComponent<PerformanceBudgetSystem>();
+            world.AddComponent<AIFrameBudgetSystem>();
             world.AddComponent<VantaSettingsSystem>();
             world.AddComponent<ActivitySystem>();
             world.AddComponent<InteractionSystem>();
