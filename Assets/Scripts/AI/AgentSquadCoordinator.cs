@@ -12,12 +12,24 @@ namespace Vanta.AI
         public SquadAssignment(int id, SquadRole role, float priority) { Id=id; Role=role; Priority=priority; }
     }
 
+    public readonly struct SquadCommandAssignment
+    {
+        public readonly int Id;
+        public readonly SquadRole Role;
+        public readonly SquadCommand Command;
+        public readonly float Utility;
+        public SquadCommandAssignment(int id, SquadRole role, SquadCommand command, float utility)
+        { Id=id; Role=role; Command=command; Utility=utility; }
+    }
+
     /// <summary>Deterministic runtime squad coordinator. Highest priority leads; remaining members fill tactical roles.</summary>
     public sealed class AgentSquadCoordinator
     {
         readonly List<SquadMember> members = new();
         readonly int maxSize;
         public AgentSquadCoordinator(int maxSize = 8) => this.maxSize = Mathf.Max(1, maxSize);
+        public int Count => members.Count;
+        public void Clear() => members.Clear();
 
         public void Add(int id, float priority)
         {
@@ -37,6 +49,20 @@ namespace Vanta.AI
             }
             return result;
         }
+
+        public IReadOnlyList<SquadCommandAssignment> BuildCommandAssignments(
+            Func<int, SquadRole, SquadCommandContext> contextProvider)
+        {
+            var assignments = BuildAssignments();
+            var result = new List<SquadCommandAssignment>(assignments.Count);
+            if (contextProvider == null) return result;
+            foreach (var assignment in assignments)
+            {
+                var command = AgentSquadCommandSystem.Evaluate(contextProvider(assignment.Id, assignment.Role));
+                result.Add(new SquadCommandAssignment(assignment.Id, assignment.Role, command.Command, command.Utility));
+            }
+            return result;
+        }
     }
 
     public sealed class AgentSquadCoordinatorComponent : MonoBehaviour
@@ -48,6 +74,7 @@ namespace Vanta.AI
         void Awake() => coordinator = new AgentSquadCoordinator(maxSize);
 
         public IReadOnlyList<SquadAssignment> CurrentAssignments { get; private set; } = Array.Empty<SquadAssignment>();
+        public IReadOnlyList<SquadCommandAssignment> CurrentCommands { get; private set; } = Array.Empty<SquadCommandAssignment>();
 
         void Update()
         {
@@ -65,6 +92,21 @@ namespace Vanta.AI
                 coordinator.Add(brains[i].GetInstanceID(), Mathf.Clamp01(priority));
             }
             CurrentAssignments = coordinator.BuildAssignments();
+            CurrentCommands = coordinator.BuildCommandAssignments((id, role) =>
+            {
+                var brain = FindBrain(brains, id);
+                var distance = brain && player ? Vector3.Distance(brain.transform.position, player.position) : 999f;
+                var visible = brain && player && distance <= 30f;
+                var threat = brain ? Mathf.Clamp01(1f - distance / 30f) : 0f;
+                var leaderVisible = player && CurrentAssignments.Count > 0;
+                return new SquadCommandContext(role, threat, distance, visible, CurrentAssignments.Count > 0, leaderVisible);
+            });
+        }
+
+        static VantaAgentBrain FindBrain(VantaAgentBrain[] brains, int id)
+        {
+            for (var i = 0; i < brains.Length; i++) if (brains[i] && brains[i].GetInstanceID() == id) return brains[i];
+            return null;
         }
 
         public void AddMember(int id, float priority) => coordinator.Add(id, priority);
