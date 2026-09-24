@@ -56,6 +56,26 @@ public sealed class AdvancedAIAgentSystemTests
     }
 
     [Test]
+    public void SquadSelectsHighestPriorityLeaderOrAssaultMember()
+    {
+        var squad = new AgentSquadSystem();
+        squad.AddOrUpdate(new SquadMember(7, SquadRole.Assault, 0.4f));
+        squad.AddOrUpdate(new SquadMember(3, SquadRole.Leader, 0.9f));
+        squad.AddOrUpdate(new SquadMember(2, SquadRole.Support, 1f));
+        Assert.AreEqual(3, squad.SelectLeader().Id);
+    }
+
+    [Test]
+    public void TelemetryRemainsBounded()
+    {
+        var telemetry = new AgentTelemetry(2);
+        telemetry.Record(new AgentDecisionTrace(1, AgentAction.Patrol, 0.1f));
+        telemetry.Record(new AgentDecisionTrace(2, AgentAction.Investigate, 0.2f));
+        telemetry.Record(new AgentDecisionTrace(3, AgentAction.Pursue, 0.8f));
+        Assert.AreEqual(2, telemetry.Count);
+    }
+
+    [Test]
     public void DirectorEmitsDeterministicPressureWithoutNegativeValues()
     {
         var director = new WorldSimulationDirector(1234);
