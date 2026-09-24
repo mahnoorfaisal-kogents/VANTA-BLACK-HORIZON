@@ -9,22 +9,36 @@ namespace Vanta.AI
         [SerializeField, Min(1)] int maxTicksPerFrame = 12;
         AITickBudget budget;
         readonly List<VantaAgentBrain> agents = new();
+        int budgetFrame = -1;
 
         public int MaxTicksPerFrame => Mathf.Max(1, maxTicksPerFrame);
 
-        void Awake() => budget = new AITickBudget(MaxTicksPerFrame);
+        void Awake()
+        {
+            budget = new AITickBudget(MaxTicksPerFrame);
+            budgetFrame = Time.frameCount;
+        }
 
         void Update()
         {
-            budget.Reset();
+            ResetForCurrentFrame();
             agents.RemoveAll(a => !a);
         }
 
         public bool TryAcquire(VantaAgentBrain agent, float priority)
         {
-            if (!agent || budget == null) return false;
+            if (!agent) return false;
+            if (budget == null) budget = new AITickBudget(MaxTicksPerFrame);
+            ResetForCurrentFrame();
             if (!agents.Contains(agent)) agents.Add(agent);
             return budget.TryAcquire(agent.GetInstanceID(), priority);
+        }
+
+        void ResetForCurrentFrame()
+        {
+            if (budgetFrame == Time.frameCount) return;
+            budget.Reset();
+            budgetFrame = Time.frameCount;
         }
     }
 }
