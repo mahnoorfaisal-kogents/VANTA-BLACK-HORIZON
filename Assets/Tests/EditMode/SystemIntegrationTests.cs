@@ -95,5 +95,13 @@ namespace Vanta.Tests
             Assert.That(graph.Nodes["b"].status, Is.EqualTo(ObjectiveStatus.Available));
         }
 
+        [Test] public void WantedHeatCanBeRestoredFromSave()
+        {
+            var w = new WantedSystem();
+            w.SetHeatForLoad(3.25f);
+            Assert.That(w.Heat, Is.EqualTo(3.25f).Within(0.001f));
+            Assert.That(w.Level, Is.EqualTo(4));
+        }
+
     }
 }
