@@ -106,7 +106,10 @@ namespace Vanta.EditorTools
             world.AddComponent<SafehouseGarageSystem>();
             world.AddComponent<MissionSystem>();
             world.AddComponent<MissionConsequenceSystem>();
-            world.AddComponent<SaveSystem>();
+            var saveSystem = world.AddComponent<SaveSystem>();
+            var saveCoordinator = world.AddComponent<SaveGameCoordinator>();
+            var saveSo = new SerializedObject(saveCoordinator);
+            saveSo.FindProperty("saveSystem").objectReferenceValue = saveSystem;
             var coordinator = world.AddComponent<GameWorldCoordinator>();
             var coordinatorSo = new SerializedObject(coordinator);
             coordinatorSo.FindProperty("wanted").objectReferenceValue = world.GetComponent<WantedSystem>();
@@ -123,6 +126,13 @@ namespace Vanta.EditorTools
             world.AddComponent<GameSession>();
 
             var player = CreatePlayer();
+            saveSo.FindProperty("player").objectReferenceValue = player.transform;
+            saveSo.FindProperty("economy").objectReferenceValue = world.GetComponent<EconomySystem>();
+            saveSo.FindProperty("wanted").objectReferenceValue = world.GetComponent<WantedSystem>();
+            saveSo.FindProperty("progression").objectReferenceValue = world.GetComponent<ProgressionSystem>();
+            saveSo.FindProperty("worldTime").objectReferenceValue = world.GetComponent<WorldTimeSystem>();
+            saveSo.FindProperty("missions").objectReferenceValue = world.GetComponent<MissionSystem>();
+            saveSo.ApplyModifiedPropertiesWithoutUndo();
             var camera = CreateCamera(player.transform);
             ConfigureWeapon(player.GetComponent<WeaponController>(), player.transform.Find("Muzzle"), camera.GetComponent<Camera>());
             CreateEnemy(player.transform);
