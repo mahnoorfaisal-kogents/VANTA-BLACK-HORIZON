@@ -86,6 +86,28 @@ namespace Vanta.Tests
         }
 
         [Test]
+        public void AgentMemoryRecallsRelevantFactsAndEvictsLeastImportant()
+        {
+            var memory = new Vanta.AI.AgentMemoryStore(2);
+            Assert.That(memory.Remember("district", "Black Horizon market is under faction pressure", 0.9f, 1), Is.True);
+            Assert.That(memory.Remember("mission", "Recover the encrypted ledger", 0.8f, 2), Is.True);
+            Assert.That(memory.Remember("low", "temporary rumor", 0.1f, 3), Is.True);
+            Assert.That(memory.Count, Is.EqualTo(2));
+            Assert.That(memory.RecallRelevant("encrypted ledger").Count, Is.EqualTo(1));
+            Assert.That(memory.RecallRelevant("encrypted ledger")[0].key, Is.EqualTo("mission"));
+        }
+
+        [Test]
+        public void AgentDecisionSystemPrioritizesThreatAndDeterministicallyBreaksTies()
+        {
+            var flee = Vanta.AI.AgentDecisionSystem.Choose(new Vanta.AI.AgentDecisionContext(1f, 0f, 0f, false, false));
+            Assert.That(flee, Is.EqualTo(Vanta.AI.AgentAction.Flee));
+
+            var patrol = Vanta.AI.AgentDecisionSystem.Choose(new Vanta.AI.AgentDecisionContext(0f, 0f, 0f, false, false));
+            Assert.That(patrol, Is.EqualTo(Vanta.AI.AgentAction.Patrol));
+        }
+
+        [Test]
         public void PopulationModelsRespectSharedPerformanceBudgets()
         {
             var budget = new PerformanceBudgetPolicy(2, 3);
