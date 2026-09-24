@@ -131,3 +131,11 @@ No runtime-complete or build-complete claim should be made until Unity actually 
 - Source implementation pass: IMPLEMENTED.
 - GitHub Actions currently has zero workflow runs for this repository; therefore no CI/Unity execution evidence exists.
 - Unity Editor import/compile, Test Runner execution, Play Mode, NavMesh runtime, mission runtime, vehicle runtime, performance profiling, and Windows `.exe` build remain UNVERIFIED. These require an actual Unity Editor/CI execution environment and cannot truthfully be marked complete from source inspection alone.
+
+## Final verification / automated Windows build checkpoint — 2026-09-24
+- Fixed generated vertical-slice AIDirector initialization ordering so WantedSystem exists before AIDirector.Awake() and its serialized references are assigned.
+- Added automatic Windows build trigger on pushes to main.
+- GitHub Actions Project Integrity workflow: PASS on the pre-build checkpoint.
+- Automated Windows build was actually triggered for commit fb0de6a1852b83f3de224006d8f098bba848e92c and reached the Unity builder.
+- Build result: BLOCKED before Unity project compilation because the repository has no configured Unity license secret/serial. The workflow log reports: Missing Unity License File and no Serial was found.
+- Therefore no .exe artifact was produced by this run. Unity compile, EditMode, Play Mode, NavMesh runtime, and Windows executable remain UNVERIFIED until a licensed Unity activation is supplied to GitHub Actions or the project is opened/built in a local Unity Editor.
