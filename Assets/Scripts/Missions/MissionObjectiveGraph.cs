@@ -30,23 +30,17 @@ namespace Vanta.Missions
                 if (node == null || string.IsNullOrWhiteSpace(node.id)) continue;
                 nodes[node.id] = new MissionObjectiveNode
                 {
-                    id = node.id,
-                    title = node.title,
+                    id = node.id, title = node.title,
                     prerequisites = node.prerequisites == null ? Array.Empty<string>() : (string[])node.prerequisites.Clone(),
                     approaches = node.approaches == null ? Array.Empty<string>() : (string[])node.approaches.Clone(),
-                    status = ObjectiveStatus.Locked,
-                    Optional = node.Optional
+                    status = ObjectiveStatus.Locked, Optional = node.Optional
                 };
             }
             RefreshAvailability();
         }
 
-        public bool SetActive(string id)
-        {
-            if (!nodes.TryGetValue(id, out var node) || node.status != ObjectiveStatus.Available) return false;
-            node.status = ObjectiveStatus.Active;
-            return true;
-        }
+        public bool SetActive(string id) =>
+            nodes.TryGetValue(id, out var node) && node.status == ObjectiveStatus.Available && SetStatus(node, ObjectiveStatus.Active);
 
         public bool Complete(string id)
         {
@@ -64,6 +58,13 @@ namespace Vanta.Missions
             return true;
         }
 
+        public bool CanCompleteMission()
+        {
+            foreach (var node in nodes.Values)
+                if (!node.Optional && node.status != ObjectiveStatus.Complete) return false;
+            return true;
+        }
+
         public bool ArePrerequisitesComplete(MissionObjectiveNode node)
         {
             if (node.prerequisites == null || node.prerequisites.Length == 0) return true;
@@ -73,18 +74,22 @@ namespace Vanta.Missions
             return true;
         }
 
-        public bool SupportsApproach(string id, string approach)
-        {
-            return nodes.TryGetValue(id, out var node) &&
-                   (node.approaches == null || node.approaches.Length == 0 ||
-                    Array.Exists(node.approaches, x => string.Equals(x, approach, StringComparison.OrdinalIgnoreCase)));
-        }
+        public bool SupportsApproach(string id, string approach) =>
+            nodes.TryGetValue(id, out var node) &&
+            (node.approaches == null || node.approaches.Length == 0 ||
+             Array.Exists(node.approaches, x => string.Equals(x, approach, StringComparison.OrdinalIgnoreCase)));
 
         void RefreshAvailability()
         {
             foreach (var node in nodes.Values)
                 if (node.status == ObjectiveStatus.Locked && ArePrerequisitesComplete(node))
                     node.status = ObjectiveStatus.Available;
+        }
+
+        static bool SetStatus(MissionObjectiveNode node, ObjectiveStatus status)
+        {
+            node.status = status;
+            return true;
         }
     }
 }
