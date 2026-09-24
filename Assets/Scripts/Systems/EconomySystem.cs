@@ -1,2 +1,33 @@
-using System;using UnityEngine;
-namespace Vanta.Systems{public sealed class EconomySystem:MonoBehaviour{[SerializeField]private int cash;public int Cash=>cash;public event Action<int> CashChanged;public void AddCash(int amount){cash=Mathf.Max(0,cash+amount);CashChanged?.Invoke(cash);}public bool Spend(int amount){if(amount<0||cash<amount)return false;cash-=amount;CashChanged?.Invoke(cash);return true;}}}
+using System;
+using UnityEngine;
+
+namespace Vanta.Systems
+{
+    public sealed class EconomySystem : MonoBehaviour
+    {
+        [SerializeField] private int cash;
+        public int Cash => cash;
+        public event Action<int> CashChanged;
+
+        public void AddCash(int amount)
+        {
+            if (amount == 0) return;
+            cash = Mathf.Max(0, cash + amount);
+            CashChanged?.Invoke(cash);
+        }
+
+        public bool Spend(int amount)
+        {
+            if (amount < 0 || cash < amount) return false;
+            cash -= amount;
+            CashChanged?.Invoke(cash);
+            return true;
+        }
+
+        public void SetCashForLoad(int value)
+        {
+            cash = Mathf.Max(0, value);
+            CashChanged?.Invoke(cash);
+        }
+    }
+}
