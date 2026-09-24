@@ -93,7 +93,6 @@ namespace Vanta.EditorTools
             world.AddComponent<PolicePursuitCoordinator>();
             world.AddComponent<FactionSystem>();
             world.AddComponent<FactionTerritorySystem>();
-            world.AddComponent<FactionWorldEffects>();
             world.AddComponent<InventorySystem>();
             world.AddComponent<EconomySystem>();
             world.AddComponent<ProgressionSystem>();
