@@ -39,13 +39,17 @@ namespace Vanta.Save
             var data = saveSystem.Load(slot);
             if (data == null) return false;
 
-            player.position = data.playerPosition;
+            // Restore mission runtime before applying dependent world/player state.
+            // A failed mission restore must not leave a partially restored session.
+            if (missions && data.missions != null &&
+                !missions.RestoreSaveState(data.missions, missionDefinitions))
+                return false;
+
             if (economy) economy.SetCashForLoad(data.cash);
             if (wanted) wanted.SetHeatForLoad(data.wantedHeat);
             if (progression) progression.SetXpForLoad(data.xp);
             if (worldTime) worldTime.SetTimeForLoad(data.timeOfDay);
-            if (missions && data.missions != null)
-                missions.RestoreSaveState(data.missions, missionDefinitions);
+            player.position = data.playerPosition;
             return true;
         }
     }
