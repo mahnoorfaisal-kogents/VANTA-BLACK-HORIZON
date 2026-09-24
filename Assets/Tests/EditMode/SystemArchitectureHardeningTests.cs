@@ -2,6 +2,7 @@ using NUnit.Framework;
 using Vanta.AI;
 using Vanta.Combat;
 using Vanta.Missions;
+using Vanta.Systems;
 using Vanta.Vehicles;
 using Vanta.World;
 
@@ -57,6 +58,31 @@ namespace Vanta.Tests
             Assert.That(state.ApplyDamage(100f), Is.EqualTo(0f));
             Assert.That(state.ApplyDamage(10f), Is.EqualTo(0f));
             Assert.That(destroyed, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void PerformanceBudgetRejectsPopulationAtCapacity()
+        {
+            var budget = new PerformanceBudgetSystem();
+            Assert.That(budget.CanSpawnTraffic(31), Is.True);
+            Assert.That(budget.CanSpawnTraffic(32), Is.False);
+            Assert.That(budget.CanSpawnCivilian(47), Is.True);
+            Assert.That(budget.CanSpawnCivilian(48), Is.False);
+            Assert.That(budget.IsWithinBudget(32, 48), Is.True);
+            Assert.That(budget.IsWithinBudget(33, 48), Is.False);
+        }
+
+        [Test]
+        public void PerformanceBudgetClampsInvalidConfiguration()
+        {
+            var budget = new PerformanceBudgetSystem();
+            var target = typeof(PerformanceBudgetSystem).GetField("targetFrameRate",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            target.SetValue(budget, 0);
+            var validate = typeof(PerformanceBudgetSystem).GetMethod("OnValidate",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            validate.Invoke(budget, null);
+            Assert.That(budget.TargetFrameRate, Is.EqualTo(1));
         }
 
         [Test]
