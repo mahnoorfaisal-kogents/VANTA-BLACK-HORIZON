@@ -92,6 +92,11 @@ namespace Vanta.EditorTools
             world.AddComponent<AIDirector>();
             world.AddComponent<AgentSquadCoordinatorComponent>();
             world.AddComponent<AgentSquadKnowledgeCoordinator>();
+            var aiDirector = world.GetComponent<AIDirector>();
+            var aiDirectorSo = new SerializedObject(aiDirector);
+            aiDirectorSo.FindProperty("wanted").objectReferenceValue = world.GetComponent<WantedSystem>();
+            aiDirectorSo.FindProperty("worldEvents").objectReferenceValue = world.GetComponent<WorldEventSystem>();
+            aiDirectorSo.ApplyModifiedPropertiesWithoutUndo();
             world.AddComponent<VantaSettingsSystem>();
             world.AddComponent<ActivitySystem>();
             world.AddComponent<InteractionSystem>();
