@@ -1,0 +1,108 @@
+using NUnit.Framework;
+using System.Collections.Generic;
+using UnityEngine;
+using Vanta.AI;
+using Vanta.Systems;
+using Vanta.World;
+using Vanta.Missions;
+using Vanta.Map;
+
+namespace Vanta.Tests
+{
+    public sealed class SystemIntegrationTests
+    {
+        [Test] public void MissionConsequencesApplyRewardsAndReputation()
+        {
+            var c = new MissionConsequenceSystem();
+            var result = c.Resolve(new MissionConsequence { cash = 250, factionId = "Iron Jackals", reputationDelta = 15, territoryId = "dock", territoryDelta = 10 });
+            Assert.That(result.Cash, Is.EqualTo(250));
+            Assert.That(result.ReputationDelta, Is.EqualTo(15));
+            Assert.That(result.TerritoryDelta, Is.EqualTo(10));
+        }
+
+        [Test] public void WorldEventTransitionsDeterministically()
+        {
+            var e = new WorldEventRuntime();
+            Assert.That(e.TryActivate(), Is.True);
+            Assert.That(e.State, Is.EqualTo(WorldEventState.Active));
+            Assert.That(e.TryResolve(), Is.True);
+            Assert.That(e.State, Is.EqualTo(WorldEventState.Resolved));
+        }
+
+        [Test] public void FactionWorldEffectsResolveDangerAndMissionAccess()
+        {
+            var e = FactionWorldEffects.Evaluate(TerritoryControl.Hostile, 80);
+            Assert.That(e.DangerMultiplier, Is.GreaterThan(1f));
+            Assert.That(e.MissionAccess, Is.EqualTo(WorldMissionAccess.Restricted));
+        }
+
+        [Test] public void TrafficPopulationCapsAndReusesSlots()
+        {
+            var p = new TrafficPopulationModel(2);
+            Assert.That(p.TrySpawn("car-a"), Is.True);
+            Assert.That(p.TrySpawn("car-b"), Is.True);
+            Assert.That(p.TrySpawn("car-c"), Is.False);
+            Assert.That(p.Despawn("car-a"), Is.True);
+            Assert.That(p.TrySpawn("car-c"), Is.True);
+        }
+
+        [Test] public void IntelMapRevealsMarkersOnce()
+        {
+            var map = new IntelMapSystem();
+            Assert.That(map.Reveal("mission-1", WorldMarker.MarkerType.Mission), Is.True);
+            Assert.That(map.Reveal("mission-1", WorldMarker.MarkerType.Mission), Is.False);
+            Assert.That(map.IsRevealed("mission-1"), Is.True);
+        }
+
+        [Test] public void ProgressionUnlocksByXpThreshold()
+        {
+            var p = new ProgressionSystem();
+            p.AddXp(1000);
+            Assert.That(p.Level, Is.GreaterThanOrEqualTo(2));
+        }
+
+        [Test] public void PoliceCoordinatorMapsWantedToEscalation()
+        {
+            var c = new PolicePursuitCoordinator();
+            c.Update(5);
+            Assert.That(c.Escalation, Is.EqualTo(PoliceEscalationLevel.Major));
+            Assert.That(c.PursuitState, Is.EqualTo(PursuitState.Intercepting));
+        }
+        [Test] public void ConsequenceModelAppliesAllGameplayState()
+        {
+            var m = new GameplayConsequenceModel();
+            m.Apply(new MissionConsequence { cash = 500, factionId = "iron_jackals", reputationDelta = 20, territoryId = "dock", territoryDelta = 15, wantedHeat = 0.5f, revealIds = new[]{"safehouse-1"}, xp = 250 });
+            Assert.That(m.Cash, Is.EqualTo(500));
+            Assert.That(m.GetReputation("iron_jackals"), Is.EqualTo(20));
+            Assert.That(m.GetTerritoryInfluence("dock"), Is.EqualTo(15));
+            Assert.That(m.WantedHeat, Is.EqualTo(0.5f).Within(0.001f));
+            Assert.That(m.Xp, Is.EqualTo(250));
+            Assert.That(m.IsRevealed("safehouse-1"), Is.True);
+        }
+
+        [Test] public void MissionGraphBuildDoesNotMutateDefinitionNodes()
+        {
+            var source = new[]
+            {
+                new MissionObjectiveNode { id="a", title="A" },
+                new MissionObjectiveNode { id="b", title="B", prerequisites=new[]{"a"} }
+            };
+            var graph = new MissionObjectiveGraph();
+            graph.Build(source);
+            graph.SetActive("a");
+            graph.Complete("a");
+            Assert.That(source[0].status, Is.EqualTo(ObjectiveStatus.Locked));
+            Assert.That(source[1].status, Is.EqualTo(ObjectiveStatus.Locked));
+            Assert.That(graph.Nodes["b"].status, Is.EqualTo(ObjectiveStatus.Available));
+        }
+
+        [Test] public void WantedHeatCanBeRestoredFromSave()
+        {
+            var w = new WantedSystem();
+            w.SetHeatForLoad(3.25f);
+            Assert.That(w.Heat, Is.EqualTo(3.25f).Within(0.001f));
+            Assert.That(w.Level, Is.EqualTo(4));
+        }
+
+    }
+}

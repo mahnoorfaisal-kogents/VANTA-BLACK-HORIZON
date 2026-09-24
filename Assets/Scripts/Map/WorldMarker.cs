@@ -1,0 +1,2 @@
+using UnityEngine;
+namespace Vanta.Map{public enum MarkerType{Player,Mission,Enemy,Safehouse,Garage,Shop,Event}public sealed class WorldMarker:MonoBehaviour{public MarkerType type;public string markerId;}}

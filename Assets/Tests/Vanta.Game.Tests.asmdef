@@ -1,0 +1,14 @@
+{
+  "name": "Vanta.Game.Tests",
+  "rootNamespace": "Vanta.Tests",
+  "references": ["Vanta.Game.Runtime"],
+  "includePlatforms": ["Editor"],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": ["nunit.framework.dll"],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
