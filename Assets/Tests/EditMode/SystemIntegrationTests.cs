@@ -5,6 +5,7 @@ using Vanta.AI;
 using Vanta.Systems;
 using Vanta.World;
 using Vanta.Missions;
+using Vanta.Map;
 
 namespace Vanta.Tests
 {
