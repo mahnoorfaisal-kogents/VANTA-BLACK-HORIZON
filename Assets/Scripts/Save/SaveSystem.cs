@@ -14,6 +14,7 @@ namespace Vanta.Save
         public int xp;
         public float timeOfDay;
         public string activeMission;
+        public System.Collections.Generic.List<MissionSaveState> missions = new();
     }
 
     public sealed class SaveSystem : MonoBehaviour
@@ -68,7 +69,7 @@ namespace Vanta.Save
             var invalid = Path.GetInvalidFileNameChars();
             var chars = slot.Trim().ToCharArray();
             for (var i = 0; i < chars.Length; i++)
-                if (Array.IndexOf(invalid, chars[i]) >= 0 || chars[i] == '/' || chars[i] == '\')
+                if (Array.IndexOf(invalid, chars[i]) >= 0 || chars[i] == '/' || chars[i] == '\\')
                     chars[i] = '_';
             return new string(chars).Trim('.', ' ');
         }
