@@ -7,12 +7,12 @@ namespace Vanta.AI
     public sealed class AIFrameBudgetSystem : MonoBehaviour
     {
         [SerializeField, Min(1)] int maxTicksPerFrame = 12;
-        readonly AITickBudget budget = new(12);
+        AITickBudget budget;
         readonly List<VantaAgentBrain> agents = new();
 
         public int MaxTicksPerFrame => Mathf.Max(1, maxTicksPerFrame);
 
-        void Awake() => budget.Reset();
+        void Awake() => budget = new AITickBudget(MaxTicksPerFrame);
 
         void Update()
         {
@@ -22,7 +22,7 @@ namespace Vanta.AI
 
         public bool TryAcquire(VantaAgentBrain agent, float priority)
         {
-            if (!agent) return false;
+            if (!agent || budget == null) return false;
             if (!agents.Contains(agent)) agents.Add(agent);
             return budget.TryAcquire(agent.GetInstanceID(), priority);
         }
