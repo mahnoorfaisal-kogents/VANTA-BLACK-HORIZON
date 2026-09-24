@@ -15,6 +15,7 @@ namespace Vanta.Save
         [SerializeField] ProgressionSystem progression;
         [SerializeField] WorldTimeSystem worldTime;
         [SerializeField] MissionSystem missions;
+        [SerializeField] MissionDefinition[] missionDefinitions;
 
         public bool SaveSlot(string slot)
         {
@@ -27,7 +28,8 @@ namespace Vanta.Save
                 wantedHeat = wanted ? wanted.Heat : 0f,
                 xp = progression ? progression.Xp : 0,
                 timeOfDay = worldTime ? worldTime.TimeOfDay : 8f,
-                activeMission = missions ? missions.ActiveMissionId : null
+                activeMission = missions ? missions.ActiveMissionId : null,
+                missions = missions ? missions.CaptureSaveState() : new System.Collections.Generic.List<MissionSaveState>()
             });
         }
 
@@ -42,6 +44,8 @@ namespace Vanta.Save
             if (wanted) wanted.SetHeatForLoad(data.wantedHeat);
             if (progression) progression.SetXpForLoad(data.xp);
             if (worldTime) worldTime.SetTimeForLoad(data.timeOfDay);
+            if (missions && data.missions != null)
+                missions.RestoreSaveState(data.missions, missionDefinitions);
             return true;
         }
     }
