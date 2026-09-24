@@ -8,6 +8,10 @@
 - Current source checkpoint includes the original systemic gameplay wave plus the next source-only integration wave.
 
 ## Source-only systems implemented
+- System hardening regression coverage added for pursuit escalation, overnight schedules, traffic capacity and world-event lifecycle.
+- Runtime systems were reviewed for deterministic transition guards and bounded population behavior.
+- Source-side streaming/performance foundations are now represented without claiming actual profiling or scene streaming execution.
+
 - Mission consequence data is attached to mission definitions and consumed on mission completion.
 - `GameWorldCoordinator` connects mission rewards to economy, progression, faction reputation, territory influence, wanted heat and intel reveals.
 - Wanted changes drive police escalation and pursuit state.
