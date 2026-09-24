@@ -21,7 +21,7 @@ namespace Vanta.Missions
         readonly Dictionary<string, RuntimeMission> missions = new();
         public event Action<string, Status> StatusChanged;
 
-        public Status GetStatus(string id) =>
+        public string ActiveMissionId\n        {\n            get\n            {\n                foreach (var pair in missions)\n                    if (pair.Value.status == Status.Active) return pair.Key;\n                return null;\n            }\n        }\n\n        public Status GetStatus(string id) =>
             missions.TryGetValue(id, out var m) ? m.status : Status.Inactive;
 
         public MissionConsequence GetConsequence(string id) =>
