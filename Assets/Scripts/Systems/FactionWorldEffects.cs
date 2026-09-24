@@ -1,5 +1,4 @@
 using UnityEngine;
-using Vanta.Systems;
 
 namespace Vanta.Systems
 {
@@ -18,16 +17,13 @@ namespace Vanta.Systems
     {
         public static FactionWorldEffect Evaluate(TerritoryControl control, int controlValue)
         {
-            var danger = control switch
-            {
-                TerritoryControl.Hostile => 1.5f,
-                TerritoryControl.Contested => 1.25f,
-                TerritoryControl.Allied => .75f,
-                _ => 1f
-            };
-            var access = control == TerritoryControl.Hostile && controlValue >= 60
+            var danger = control == TerritoryControl.Hostile ? 1.5f :
+                         control == TerritoryControl.Contested ? 1.25f :
+                         control == TerritoryControl.Allied ? .75f : 1f;
+            var access = control == TerritoryControl.Hostile
                 ? WorldMissionAccess.Restricted : WorldMissionAccess.Available;
-            var threat = control == TerritoryControl.Hostile ? 1f : control == TerritoryControl.Contested ? .5f : .2f;
+            var threat = control == TerritoryControl.Hostile ? 1f :
+                         control == TerritoryControl.Contested ? .5f : .2f;
             return new FactionWorldEffect(danger, access, threat);
         }
     }
