@@ -71,7 +71,13 @@ namespace Vanta.AI
         [SerializeField] float refreshSeconds = 1f;
         AgentSquadCoordinator coordinator;
         float timer;
-        void Awake() => coordinator = new AgentSquadCoordinator(maxSize);
+        void Awake() => EnsureInitialized();
+
+        void EnsureInitialized()
+        {
+            if (coordinator == null)
+                coordinator = new AgentSquadCoordinator(maxSize);
+        }
 
         public IReadOnlyList<SquadAssignment> CurrentAssignments { get; private set; } = Array.Empty<SquadAssignment>();
         public IReadOnlyList<SquadCommandAssignment> CurrentCommands { get; private set; } = Array.Empty<SquadCommandAssignment>();
@@ -81,6 +87,7 @@ namespace Vanta.AI
             timer -= Time.deltaTime;
             if (timer > 0f) return;
             timer = Mathf.Max(0.1f, refreshSeconds);
+            EnsureInitialized();
             coordinator.Clear();
             var brains = GetComponentsInChildren<VantaAgentBrain>(true);
             var player = GameObject.FindGameObjectWithTag("Player")?.transform;
@@ -109,6 +116,10 @@ namespace Vanta.AI
             return null;
         }
 
-        public void AddMember(int id, float priority) => coordinator.Add(id, priority);
+        public void AddMember(int id, float priority)
+        {
+            EnsureInitialized();
+            coordinator.Add(id, priority);
+        }
     }
 }
