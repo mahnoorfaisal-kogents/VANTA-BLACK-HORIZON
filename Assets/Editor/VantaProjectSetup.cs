@@ -91,11 +91,6 @@ namespace Vanta.EditorTools
             world.AddComponent<AIFrameBudgetSystem>();
             world.AddComponent<AgentSquadCoordinatorComponent>();
             world.AddComponent<AgentSquadKnowledgeCoordinator>();
-            aiDirector = world.GetComponent<AIDirector>();
-            var aiDirectorSo = new SerializedObject(aiDirector);
-            aiDirectorSo.FindProperty("wanted").objectReferenceValue = world.GetComponent<WantedSystem>();
-            aiDirectorSo.FindProperty("worldEvents").objectReferenceValue = world.GetComponent<WorldEventSystem>();
-            aiDirectorSo.ApplyModifiedPropertiesWithoutUndo();
             world.AddComponent<VantaSettingsSystem>();
             world.AddComponent<ActivitySystem>();
             world.AddComponent<InteractionSystem>();
@@ -107,8 +102,12 @@ namespace Vanta.EditorTools
             world.AddComponent<TrafficSystem>();
             world.AddComponent<TrafficPopulationSystem>();
             world.AddComponent<NPCScheduleSystem>();
-            world.AddComponent<WantedSystem>();
+            var wantedSystem = world.AddComponent<WantedSystem>();
             var aiDirector = world.AddComponent<AIDirector>();
+            var aiDirectorSo = new SerializedObject(aiDirector);
+            aiDirectorSo.FindProperty("wanted").objectReferenceValue = wantedSystem;
+            aiDirectorSo.FindProperty("worldEvents").objectReferenceValue = world.GetComponent<WorldEventSystem>();
+            aiDirectorSo.ApplyModifiedPropertiesWithoutUndo();
             world.AddComponent<PoliceEscalationSystem>();
             world.AddComponent<PolicePursuitCoordinator>();
             world.AddComponent<FactionSystem>();
