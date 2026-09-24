@@ -5,7 +5,7 @@
 - Active implementation branch: `dev/core-gameplay-foundation`
 - Unity: 2022.3.62f1
 - `main` remains untouched.
-- Latest source checkpoint: deterministic gameplay-state, enemy/pursuit transition, mission-completion and persistent-world serialization hardening.
+- Latest source checkpoint: gameplay-state, combat/vehicle state integration, mission persistence, and persistent-world serialization hardening.
 
 ## Source implementation completed in this wave
 - Unity-serializable persistent-world territory influence entries.
@@ -15,9 +15,11 @@
 - Pursuit state machine transition guards.
 - Mission objective graph exposes a required-objective completion gate.
 - Mission completion now refuses to complete while required objectives remain incomplete.
-- Deterministic vehicle damage state model with clamping, destruction event and repair support.
-- Deterministic weapon magazine/ammo state model with consume/reload behavior.
-- Regression tests cover the new state architecture and serialization model.
+- Deterministic vehicle damage state model integrated into `VehicleController`, with destruction event and repair support.
+- Deterministic weapon magazine/ammo state model integrated into `WeaponController`.
+- Mission runtime snapshots now capture objective progress and restore against known `MissionDefinition` assets.
+- Save data now serializes mission runtime snapshots; malformed Windows path-separator handling in slot sanitization was corrected.
+- Regression tests cover combat-state and mission-persistence behavior.
 
 ## Existing systemic foundation retained
 - Mission objective graph + runtime asset isolation
@@ -44,8 +46,8 @@
 - Unity Play Mode: UNVERIFIED.
 - Generated scene runtime behavior: UNVERIFIED.
 - NavMesh bake/runtime agents: UNVERIFIED.
-- Vehicle runtime integration: UNVERIFIED.
-- Weapon runtime integration: UNVERIFIED.
+- Vehicle source integration: IMPLEMENTED; runtime behavior UNVERIFIED.
+- Weapon source integration: IMPLEMENTED; runtime behavior UNVERIFIED.
 - Windows x64 .exe build and launch: UNVERIFIED.
 - Performance profiling/LOD/culling/streaming: UNVERIFIED.
 - Full authored content pass: NOT COMPLETE.
@@ -56,7 +58,7 @@
 3. Verify combat/AI sandbox end-to-end.
 4. Integrate and verify vehicle damage/repair and weapon ammo/reload with runtime presentation.
 5. Verify vehicle/traffic/police sandbox.
-6. Verify mission/faction/activity/district/save flows including restoration semantics.
+6. Verify mission/faction/activity/district/save flows including restored objective progress and runtime world-state semantics.
 7. Add authored districts, missions, dialogue, audio, VFX, animation and UI polish.
 8. Profile pooling/LOD/culling/streaming and target-hardware performance.
 9. Build and launch Windows x64, then run final regression and acceptance.
