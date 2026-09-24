@@ -22,23 +22,34 @@ namespace Vanta.Save
         public string SlotPath(string slot)
         {
             var safeSlot = SanitizeSlot(slot);
-            return Path.Combine(Application.persistentDataPath, "vanta_" + safeSlot + ".json");
+            return string.IsNullOrEmpty(safeSlot)
+                ? null
+                : Path.Combine(Application.persistentDataPath, "vanta_" + safeSlot + ".json");
         }
 
         public bool Save(string slot, SaveData data)
         {
-            if (data == null || string.IsNullOrWhiteSpace(slot)) return false;
+            if (data == null) return false;
+            var path = SlotPath(slot);
+            if (string.IsNullOrEmpty(path)) return false;
+
+            var temp = path + ".tmp";
             try
             {
-                var path = SlotPath(slot);
-                var temp = path + ".tmp";
                 File.WriteAllText(temp, JsonUtility.ToJson(data, true));
-                if (File.Exists(path)) File.Delete(path);
-                File.Move(temp, path);
+                if (File.Exists(path))
+                    File.Replace(temp, path, null);
+                else
+                    File.Move(temp, path);
                 return true;
             }
             catch (Exception exception)
             {
+                if (File.Exists(temp))
+                {
+                    try { File.Delete(temp); }
+                    catch (Exception cleanupException) { Debug.LogWarning($"VANTA save temp cleanup failed: {cleanupException.Message}"); }
+                }
                 Debug.LogError($"VANTA save failed: {exception.Message}");
                 return false;
             }
@@ -46,10 +57,10 @@ namespace Vanta.Save
 
         public SaveData Load(string slot)
         {
-            if (string.IsNullOrWhiteSpace(slot)) return null;
+            var path = SlotPath(slot);
+            if (string.IsNullOrEmpty(path)) return null;
             try
             {
-                var path = SlotPath(slot);
                 return File.Exists(path)
                     ? JsonUtility.FromJson<SaveData>(File.ReadAllText(path))
                     : null;
@@ -61,17 +72,22 @@ namespace Vanta.Save
             }
         }
 
-        public bool Exists(string slot) =>
-            !string.IsNullOrWhiteSpace(slot) && File.Exists(SlotPath(slot));
+        public bool Exists(string slot)
+        {
+            var path = SlotPath(slot);
+            return !string.IsNullOrEmpty(path) && File.Exists(path);
+        }
 
         static string SanitizeSlot(string slot)
         {
+            if (string.IsNullOrWhiteSpace(slot)) return null;
             var invalid = Path.GetInvalidFileNameChars();
             var chars = slot.Trim().ToCharArray();
             for (var i = 0; i < chars.Length; i++)
                 if (Array.IndexOf(invalid, chars[i]) >= 0 || chars[i] == '/' || chars[i] == '\\')
                     chars[i] = '_';
-            return new string(chars).Trim('.', ' ');
+            var safe = new string(chars).Trim('.', ' ');
+            return string.IsNullOrWhiteSpace(safe) ? null : safe;
         }
     }
 }
