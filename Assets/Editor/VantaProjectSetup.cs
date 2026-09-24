@@ -10,6 +10,9 @@ using Vanta.Combat;
 using Vanta.Core;
 using Vanta.Player;
 using Vanta.UI;
+using Vanta.Systems;
+using Vanta.Missions;
+using Vanta.Save;
 using Vanta.Vehicles;
 using Vanta.World;
 
@@ -26,9 +29,9 @@ namespace Vanta.EditorTools
             EnsureFolder(Root, "Materials");
             EnsureFolder(Root, "Weapons");
 
+            CreateWeaponAssets();
             var menu = CreateMainMenu();
             var district = CreateDistrict();
-            CreateWeaponAssets();
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
@@ -87,6 +90,7 @@ namespace Vanta.EditorTools
 
             var player = CreatePlayer();
             var camera = CreateCamera(player.transform);
+            ConfigureWeapon(player.GetComponent<WeaponController>(), player.transform.Find("Muzzle"), camera.GetComponent<Camera>());
             CreateEnemy(player.transform);
             CreateCivilians();
             CreateVehicles();
@@ -129,14 +133,20 @@ namespace Vanta.EditorTools
             muzzle.SetParent(go.transform);
             muzzle.localPosition = new Vector3(0.35f, 1.15f, 0.75f);
 
-            var camera = Camera.main;
-            var weaponSo = new SerializedObject(weapon);
-            weaponSo.FindProperty("aimCamera").objectReferenceValue = camera;
-            weaponSo.FindProperty("muzzle").objectReferenceValue = muzzle;
-            weaponSo.FindProperty("weapon").objectReferenceValue = AssetDatabase.LoadAssetAtPath<WeaponData>("Assets/Generated/Weapons/Sidearm.asset");
-            weaponSo.ApplyModifiedPropertiesWithoutUndo();
+            ConfigureWeapon(weapon, muzzle, null);
 
             return go;
+        }
+
+        private static void ConfigureWeapon(WeaponController weapon, Transform muzzle, Camera aimCamera)
+        {
+            if (!weapon) return;
+            var weaponSo = new SerializedObject(weapon);
+            if (aimCamera) weaponSo.FindProperty("aimCamera").objectReferenceValue = aimCamera;
+            weaponSo.FindProperty("muzzle").objectReferenceValue = muzzle;
+            weaponSo.FindProperty("weapon").objectReferenceValue =
+                AssetDatabase.LoadAssetAtPath<WeaponData>("Assets/Generated/Weapons/Sidearm.asset");
+            weaponSo.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static GameObject CreateCamera(GameObject player)
