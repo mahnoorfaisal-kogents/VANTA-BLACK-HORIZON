@@ -85,6 +85,8 @@ namespace Vanta.EditorTools
             world.AddComponent<WorldEventDirector>();
             world.AddComponent<WorldEventSystem>();
             world.AddComponent<DistrictRuntimeSystem>();
+            world.AddComponent<DistrictStreamingSystem>();
+            world.AddComponent<PerformanceBudgetSystem>();
             world.AddComponent<ActivitySystem>();
             world.AddComponent<InteractionSystem>();
             world.AddComponent<DialogueSystem>();
