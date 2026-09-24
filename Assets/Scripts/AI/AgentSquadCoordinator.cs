@@ -60,7 +60,7 @@ namespace Vanta.AI
             for (var i = 0; i < brains.Length; i++)
             {
                 if (!brains[i] || (player && brains[i].transform == player)) continue;
-                var distance = player ? Vector3.Distance(transform.position, player.position) : 0f;
+                var distance = player ? Vector3.Distance(brains[i].transform.position, player.position) : 0f;
                 var priority = Mathf.Clamp01(1f - distance / 100f) + (brains[i].LastAction == AgentAction.Pursue ? 0.2f : 0f);
                 coordinator.Add(brains[i].GetInstanceID(), Mathf.Clamp01(priority));
             }
