@@ -29,6 +29,9 @@ namespace Vanta.AI
 
             var wantedActive = wanted.Level > 0;
             var distance = Vector3.Distance(transform.position, target.position);
+            var targetVisible = distance <= detectionRange;
+            var tactical = AgentTacticalSystem.Evaluate(new AgentTacticalContext(
+                0.05f, targetVisible ? 1f : 0.25f, 0.15f, wantedActive, targetVisible, true));
 
             if (!wantedActive)
             {
@@ -60,7 +63,7 @@ namespace Vanta.AI
                 if (distance <= detectionRange)
                 {
                     lastKnownPosition = target.position;
-                    MoveToward(target.position);
+                    MoveToward(target.position, tactical.Action == AgentAction.Pursue ? 1.15f : 1f);
                 }
                 else
                 {
@@ -70,7 +73,7 @@ namespace Vanta.AI
             }
             else if (pursuit.Current == PursuitState.Searching)
             {
-                MoveToward(lastKnownPosition);
+                MoveToward(lastKnownPosition, 0.85f);
                 stateTimer -= Time.deltaTime;
                 if (distance <= interceptRange)
                 {
@@ -92,13 +95,13 @@ namespace Vanta.AI
             }
         }
 
-        private void MoveToward(Vector3 destination)
+        private void MoveToward(Vector3 destination, float speedMultiplier = 1f)
         {
             var direction = destination - transform.position;
             direction.y = 0f;
             if (direction.sqrMagnitude < 0.01f) return;
             transform.forward = Vector3.Slerp(transform.forward, direction.normalized, Time.deltaTime * 5f);
-            transform.position += transform.forward * speed * Time.deltaTime;
+            transform.position += transform.forward * speed * Mathf.Max(0.1f, speedMultiplier) * Time.deltaTime;
         }
     }
 }
