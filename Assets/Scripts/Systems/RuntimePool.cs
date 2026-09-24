@@ -20,7 +20,7 @@ namespace Vanta.Systems
 
         public void Return(T item)
         {
-            if (item == null || available.Count >= capacity) return;
+            if (item is null || available.Count >= capacity) return;
             available.Push(item);
         }
     }
