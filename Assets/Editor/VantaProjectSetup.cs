@@ -226,6 +226,7 @@ namespace Vanta.EditorTools
             go.transform.localScale = new Vector3(0.9f, 1.1f, 0.9f);
             var health = go.AddComponent<Health>();
             var ai = go.AddComponent<EnemyAI>();
+            go.AddComponent<VantaAgentBrain>();
             var so = new SerializedObject(ai);
             so.FindProperty("target").objectReferenceValue = player;
             so.ApplyModifiedPropertiesWithoutUndo();
@@ -238,6 +239,7 @@ namespace Vanta.EditorTools
             go.transform.position = new Vector3(26f, 1f, 18f);
             go.transform.localScale = new Vector3(1.4f, 1.2f, 2.2f);
             var ai = go.AddComponent<PoliceAI>();
+            go.AddComponent<VantaAgentBrain>();
             var so = new SerializedObject(ai);
             so.FindProperty("wanted").objectReferenceValue = wanted;
             so.FindProperty("target").objectReferenceValue = player;
@@ -275,6 +277,7 @@ namespace Vanta.EditorTools
                 go.transform.position = new Vector3(-22f + i * 8f, 1f, -2f);
                 go.transform.localScale = new Vector3(0.65f, 0.9f, 0.65f);
                 go.AddComponent<CivilianAI>();
+                go.AddComponent<VantaAgentBrain>();
             }
         }
 
