@@ -1,19 +1,25 @@
 # Architecture
 
-The game is intentionally modular and data-driven. Runtime code is grouped by responsibility rather than by scene.
+VANTA uses modular, deterministic runtime systems so gameplay rules can be tested independently of Unity scenes.
 
-- Core: contracts and global gameplay state
-- Player: locomotion and player health
-- Camera: third-person camera/binding
-- Combat: weapons and damage flow
-- AI: enemy state and behavior
-- World: scene/world bootstrap
-- Tests: fast EditMode behavior tests
+- **Core**: session state and cross-system orchestration.
+- **Player**: locomotion, stealth and health.
+- **Camera**: third-person camera/binding.
+- **Combat**: weapon data, firing and damage.
+- **AI**: perception, state machines, police escalation and pursuit.
+- **Missions**: definitions, objective graphs and consequence resolution.
+- **Systems**: economy, inventory, factions, territory, progression, wanted, activities, interactions and safehouse services.
+- **World**: time, weather, districts, events, traffic, schedules, discoveries, intel and dialogue.
+- **Save**: slot IO plus game-state capture/restore orchestration.
+- **Editor**: reproducible vertical-slice scene generation.
+- **Tests**: deterministic EditMode regression coverage.
 
-## Design rules
+## Integration rules
 
-1. Systems communicate through small contracts/events where practical.
-2. Weapon configuration belongs in WeaponData assets, not hard-coded per weapon.
-3. Runtime claims require Play Mode/build evidence before being marked verified.
-4. Original assets, characters, maps, missions, dialogue and branding only.
-5. Do not turn placeholders into fake completed features.
+1. Prefer data-driven definitions over hard-coded per-scene gameplay.
+2. Keep deterministic state transitions in small testable classes.
+3. Use events for cross-system notifications where practical.
+4. Runtime claims require Unity execution evidence.
+5. Generated scenes are integration fixtures, not substitutes for authored production content.
+6. Public games and AI tools are references for systems/workflows only; VANTA content stays original.
+7. Avoid introducing runtime generative AI into critical gameplay state until it has deterministic fallbacks, bounded latency/cost, and a testable contract.
