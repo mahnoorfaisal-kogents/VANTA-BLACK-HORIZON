@@ -65,7 +65,7 @@ namespace Vanta.Tests
             var c = new PolicePursuitCoordinator();
             c.Update(5);
             Assert.That(c.Escalation, Is.EqualTo(PoliceEscalationLevel.Major));
-            Assert.That(c.PursuitState, Is.EqualTo(PursuitStateMachine.State.Intercepting));
+            Assert.That(c.PursuitState, Is.EqualTo(PursuitState.Intercepting));
         }
     }
 }
