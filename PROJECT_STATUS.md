@@ -65,6 +65,28 @@ Gameplay-system comparison is documented in `Docs/GAMEPLAY_REFERENCE_COMPARISON.
 ### Tooling
 Unity 2022.3-compatible packages currently include Input System 1.6.1, Cinemachine 2.9.7, AI Navigation 1.1.4 and Animation Rigging 1.2.1.
 
+## Systemic gameplay integration wave
+- Mission consequence model: cash, XP, faction reputation, territory influence, wanted heat and intel reveals.
+- World event lifecycle: Scheduled -> Active -> Resolved/Failed.
+- Faction territory effects: danger multiplier, civilian threat and mission access state.
+- Traffic population capacity/reuse model plus route registry.
+- NPC schedule resolution including overnight schedules.
+- Safehouse/garage service registry.
+- Intel map reveal registry.
+- Progression/XP level system.
+- Wanted-level police escalation and pursuit coordinator.
+- Persistent world snapshot foundation for time, weather, discoveries, missions and territory influence.
+- Vertical-slice generator now wires systemic services and bakes an AI Navigation NavMesh surface during editor generation.
+- Added deterministic integration tests for systemic state transitions.
+
+## Verification truth
+- Source implementation: completed for the current source-level scope.
+- Deterministic tests: authored, but this environment does not provide a Unity Editor/Test Runner, so test execution is NOT claimed.
+- Unity Play Mode: not executed in this environment.
+- Windows .exe build: not executed in this environment.
+- Runtime-generated scenes: generator updated, but generated scenes/NavMesh still require a real Unity Editor run for final acceptance.
+- main branch: untouched; implementation remains on dev/core-gameplay-foundation.
+
 ## Not yet complete
 - Runtime-generated/editor-created scene assets have an automated setup path; generated files are not yet runtime-verified
 - Play Mode verification
