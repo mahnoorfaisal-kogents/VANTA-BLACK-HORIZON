@@ -12,6 +12,9 @@
 - `TrafficPopulationSystem` now consumes the central traffic budget before spawning.
 - Added `CivilianPopulationSystem` with the same deterministic budget contract.
 - `DistrictStreamingSystem` now supports configured district-to-scene mappings and additive `SceneManager.LoadSceneAsync` / unload lifecycle callbacks, while retaining deterministic state transitions for tests.
+- Added a deterministic `AgentMemoryStore` with bounded memory, importance-based eviction, and keyword retrieval; this provides a game-owned grounding layer rather than a hard dependency on an external LLM service.
+- Added `AgentDecisionSystem` utility scoring for threat, curiosity, social need, visibility, and target presence, with deterministic tie behavior across Idle/Patrol/Investigate/Flee/Pursue/Assist/Converse actions.
+- Research-informed direction: Unity's current AI tooling emphasizes project-aware agents, MCP, AI Gateway, Generators, and local Sentis inference; NVIDIA ACE emphasizes small/on-device character intelligence, RAG and agent loops; Convai emphasizes knowledge banks, scene-aware actions, proactive agents, and multimodal/spatial interaction. VANTA adopts the useful architectural ideas without copying proprietary content or requiring those services at runtime. citeturn0search0turn0search3turn0search10
 - Added regression coverage for shared population budgets and district lifecycle guards.
 - Unity runtime execution remains explicitly unverified in this environment.
 
