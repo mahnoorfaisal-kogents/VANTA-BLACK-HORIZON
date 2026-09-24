@@ -79,6 +79,16 @@ namespace Vanta.Missions
             (node.approaches == null || node.approaches.Length == 0 ||
              Array.Exists(node.approaches, x => string.Equals(x, approach, StringComparison.OrdinalIgnoreCase)));
 
+        public ObjectiveStatus GetStatus(string id) =>
+            nodes.TryGetValue(id, out var node) ? node.status : ObjectiveStatus.Locked;
+
+        public void RestoreStatuses(IEnumerable<MissionObjectiveSaveState> states)
+        {
+            foreach (var state in states ?? Array.Empty<MissionObjectiveSaveState>())
+                if (state != null && nodes.TryGetValue(state.id, out var node))
+                    node.status = (ObjectiveStatus)Mathf.Clamp(state.status, (int)ObjectiveStatus.Locked, (int)ObjectiveStatus.Failed);
+        }
+
         void RefreshAvailability()
         {
             foreach (var node in nodes.Values)
