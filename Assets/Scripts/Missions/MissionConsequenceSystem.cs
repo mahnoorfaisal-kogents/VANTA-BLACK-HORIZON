@@ -12,6 +12,7 @@ namespace Vanta.Missions
         public string territoryId;
         public int territoryDelta;
         public float wantedHeat;
+        public int xp;
         public string[] revealIds;
     }
 
@@ -23,11 +24,12 @@ namespace Vanta.Missions
         public readonly string TerritoryId;
         public readonly int TerritoryDelta;
         public readonly float WantedHeat;
+        public readonly int Xp;
         public readonly string[] RevealIds;
         public MissionConsequenceResult(MissionConsequence c)
         {
             Cash=c?.cash??0; FactionId=c?.factionId; ReputationDelta=c?.reputationDelta??0;
-            TerritoryId=c?.territoryId; TerritoryDelta=c?.territoryDelta??0; WantedHeat=c?.wantedHeat??0f;
+            TerritoryId=c?.territoryId; TerritoryDelta=c?.territoryDelta??0; WantedHeat=c?.wantedHeat??0f; Xp=c?.xp??0;
             RevealIds=c?.revealIds??Array.Empty<string>();
         }
     }
