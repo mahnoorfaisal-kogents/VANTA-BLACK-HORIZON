@@ -100,3 +100,14 @@ No item is labeled runtime-complete without execution evidence.
 - Performance profiling on target hardware: UNVERIFIED.
 
 No runtime-complete or build-complete claim should be made until Unity actually imports the project, tests execute, the vertical slice runs, and the Windows build launches successfully.
+
+## Latest AI integration wave
+- Added AgentTacticalSystem to convert perception/context into deterministic tactical goals and actions.
+- Integrated tactical arbitration into EnemyAI, including flee/chase/combat selection.
+- Integrated tactical arbitration into CivilianAI, including flee/investigate/wander/recover reactions.
+- Integrated tactical arbitration into PoliceAI pursuit speed/behavior selection.
+- Added AIDirector + AIDirectorModel for systemic pressure evaluation and contextual world-event requests.
+- Added runtime AgentSquadCoordinator and AgentSquadCoordinatorComponent; live child VantaAgentBrain instances are assigned deterministic Leader/Assault/Support/Scout roles.
+- Added regression coverage for tactical arbitration, AI Director pressure tiers and squad assignments.
+- Source-level AI integration: IMPLEMENTED on main.
+- Unity compile, EditMode execution, Play Mode, NavMesh, and Windows build remain UNVERIFIED.
