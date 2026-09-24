@@ -86,6 +86,36 @@ namespace Vanta.Tests
         }
 
         [Test]
+        public void PopulationModelsRespectSharedPerformanceBudgets()
+        {
+            var budget = new PerformanceBudgetPolicy(2, 3);
+            var traffic = new TrafficPopulationModel(budget.MaxActiveTraffic);
+            var civilians = new CivilianPopulationModel(budget.MaxActiveCivilians);
+
+            Assert.That(traffic.TrySpawn("car-1"), Is.True);
+            Assert.That(traffic.TrySpawn("car-2"), Is.True);
+            Assert.That(traffic.TrySpawn("car-3"), Is.False);
+            Assert.That(civilians.TrySpawn("ped-1"), Is.True);
+            Assert.That(civilians.TrySpawn("ped-2"), Is.True);
+            Assert.That(civilians.TrySpawn("ped-3"), Is.True);
+            Assert.That(civilians.TrySpawn("ped-4"), Is.False);
+            Assert.That(budget.IsWithinBudget(traffic.ActiveCount, civilians.ActiveCount), Is.True);
+        }
+
+        [Test]
+        public void DistrictStreamingRejectsIllegalLifecycleTransitions()
+        {
+            var streaming = new DistrictStreamingSystem();
+            Assert.That(streaming.CompleteLoad("north"), Is.False);
+            Assert.That(streaming.BeginLoad("north"), Is.True);
+            Assert.That(streaming.BeginLoad("north"), Is.False);
+            Assert.That(streaming.CompleteLoad("north"), Is.True);
+            Assert.That(streaming.BeginUnload("north"), Is.True);
+            Assert.That(streaming.CompleteUnload("north"), Is.True);
+            Assert.That(streaming.GetState("north"), Is.EqualTo(DistrictStreamState.Unloaded));
+        }
+
+        [Test]
         public void WeaponAmmoStateSupportsDeterministicFireAndReload()
         {
             var ammo = new WeaponAmmoState(3);
