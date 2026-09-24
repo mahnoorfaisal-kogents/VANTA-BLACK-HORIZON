@@ -43,8 +43,10 @@ namespace Vanta.AI
     {
         [SerializeField, Min(1)] int maxSize = 8;
         [SerializeField] float refreshSeconds = 1f;
-        readonly AgentSquadCoordinator coordinator = new();
+        AgentSquadCoordinator coordinator;
         float timer;
+        void Awake() => coordinator = new AgentSquadCoordinator(maxSize);
+
         public IReadOnlyList<SquadAssignment> CurrentAssignments { get; private set; } = Array.Empty<SquadAssignment>();
 
         void Update()
