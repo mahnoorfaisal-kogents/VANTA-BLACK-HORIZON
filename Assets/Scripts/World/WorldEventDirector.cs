@@ -1,0 +1,2 @@
+using System;using UnityEngine;
+namespace Vanta.World{public sealed class WorldEventDirector:MonoBehaviour{[SerializeField]float interval=45f;float nextEvent;public event Action<string> EventStarted;public string[] eventTypes={"Convoy","StreetFight","PoliceIncident","Rescue","SupplyDrop"};void Start()=>nextEvent=Time.time+interval;void Update(){if(Time.time<nextEvent||eventTypes.Length==0)return;nextEvent=Time.time+interval;EventStarted?.Invoke(eventTypes[UnityEngine.Random.Range(0,eventTypes.Length)]);}}}
