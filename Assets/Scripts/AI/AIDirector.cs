@@ -48,6 +48,9 @@ namespace Vanta.AI
 
         public void Initialize(WantedSystem wantedSystem, WorldEventSystem eventSystem)
         {
+            if (worldEvents != null && worldEvents != eventSystem)
+                StopActiveEvent();
+
             wanted = wantedSystem;
             worldEvents = eventSystem;
             if (model == null)
