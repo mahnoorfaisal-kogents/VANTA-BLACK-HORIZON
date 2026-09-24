@@ -21,7 +21,7 @@ Scouting/discovery can feed the IntelMapSystem. Progression tracks XP and level 
 PersistentWorldState captures time, weather, discoveries, completed missions and territory influence. Full runtime serialization and restoration remain part of the Unity acceptance phase.
 
 ## Navigation
-The editor vertical-slice generator now adds Unity AI Navigation's NavMeshSurface and invokes BuildNavMesh during scene generation. Unity documents AI Navigation 1.1.4 as compatible with Unity 2022.3. citeturn1search0turn2search1
+The editor vertical-slice generator now adds Unity AI Navigation's NavMeshSurface and invokes BuildNavMesh during scene generation. Unity's 2022.3 documentation lists AI Navigation 1.1.4 as a compatible release.
 
 ## Verification boundary
 Source and deterministic test code are implemented. Unity Editor/Test Runner and Windows build execution are not available in the current execution environment, so runtime pass/build claims are intentionally withheld.
