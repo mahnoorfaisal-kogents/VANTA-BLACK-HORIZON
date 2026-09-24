@@ -29,17 +29,37 @@ namespace Vanta.AI
             if (!target) { State.Transition(EnemyState.Wander); return; }
 
             var distance = Vector3.Distance(transform.position, target.position);
-            if (distance <= combatRange) State.Transition(EnemyState.Combat);
-            else if (distance <= detectionRange) State.Transition(EnemyState.Chase);
-            else State.Transition(EnemyState.Wander);
+            var tactical = AgentTacticalSystem.Evaluate(new AgentTacticalContext(
+                Mathf.Clamp01(1f - distance / Mathf.Max(1f, detectionRange)),
+                Mathf.Clamp01(distance <= detectionRange ? 1f : 0f),
+                0f, true, distance <= detectionRange, true));
 
-            if (State.Current == EnemyState.Chase) MoveTowardTarget();
+            if (tactical.Action == AgentAction.Flee)
+                State.Transition(EnemyState.Flee);
+            else if (distance <= combatRange)
+                State.Transition(EnemyState.Combat);
+            else if (distance <= detectionRange)
+                State.Transition(EnemyState.Chase);
+            else
+                State.Transition(EnemyState.Wander);
+
+            if (State.Current == EnemyState.Flee) MoveAwayFromTarget();
+            else if (State.Current == EnemyState.Chase) MoveTowardTarget();
             else if (State.Current == EnemyState.Combat) AttackTarget();
         }
 
         private void MoveTowardTarget()
         {
             var direction = target.position - transform.position;
+            direction.y = 0f;
+            if (direction.sqrMagnitude <= 0.01f) return;
+            transform.rotation = Quaternion.LookRotation(direction);
+            transform.position += transform.forward * moveSpeed * Time.deltaTime;
+        }
+
+        private void MoveAwayFromTarget()
+        {
+            var direction = transform.position - target.position;
             direction.y = 0f;
             if (direction.sqrMagnitude <= 0.01f) return;
             transform.rotation = Quaternion.LookRotation(direction);
