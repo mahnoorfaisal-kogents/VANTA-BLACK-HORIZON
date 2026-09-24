@@ -1,0 +1,2 @@
+using UnityEngine;using Vanta.Systems;
+namespace Vanta.AI{public sealed class PoliceAI:MonoBehaviour{[SerializeField]WantedSystem wanted;[SerializeField]Transform target;[SerializeField]float chaseRange=35f,speed=5f;void Update(){if(!wanted||wanted.Level<=0||!target)return;if(Vector3.Distance(transform.position,target.position)>chaseRange)return;var d=target.position-transform.position;d.y=0;if(d.sqrMagnitude<.01f)return;transform.forward=Vector3.Slerp(transform.forward,d.normalized,Time.deltaTime*5f);transform.position+=transform.forward*speed*Time.deltaTime;}}}
