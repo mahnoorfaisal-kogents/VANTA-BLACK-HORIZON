@@ -7,6 +7,12 @@
 - `main` remains untouched.
 - Latest source checkpoint: gameplay-state, combat/vehicle state integration, mission persistence, and persistent-world serialization hardening.
 
+## Current phase — performance/runtime-readiness hardening
+- `PerformanceBudgetSystem` now applies its configured `Application.targetFrameRate` target when enabled.
+- Added deterministic traffic/civilian spawn-budget queries (`CanSpawnTraffic`, `CanSpawnCivilian`) for population systems to consume without exceeding configured caps.
+- Added regression coverage for population budget boundaries and invalid target-frame-rate clamping.
+- Unity runtime execution remains explicitly unverified in this environment.
+
 ## Source implementation completed in this wave
 - Unity-serializable persistent-world territory influence entries.
 - Deterministic `GameplayStateService` with guarded lifecycle transitions and change events.
