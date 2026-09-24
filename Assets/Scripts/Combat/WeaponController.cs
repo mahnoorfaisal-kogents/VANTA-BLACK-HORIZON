@@ -9,14 +9,15 @@ namespace Vanta.Combat
         [SerializeField] private WeaponData weapon;
         [SerializeField] private Camera aimCamera;
         [SerializeField] private Transform muzzle;
-        public int AmmoInMagazine { get; private set; }
+        WeaponAmmoState ammoState;
+        public int AmmoInMagazine => ammoState?.Remaining ?? 0;
         public bool IsReloading => reloading;
         private float nextShotTime;
         private bool reloading;
 
         private void Awake()
         {
-            if (weapon) AmmoInMagazine = weapon.magazineSize;
+            if (weapon) ammoState = new WeaponAmmoState(weapon.magazineSize);
         }
 
         private void Update()
@@ -32,7 +33,7 @@ namespace Vanta.Combat
             if (AmmoInMagazine <= 0) { StartCoroutine(Reload()); return; }
 
             nextShotTime = Time.time + 1f / Mathf.Max(0.01f, weapon.roundsPerSecond);
-            AmmoInMagazine--;
+            if (!ammoState.TryConsumeRound()) return;
 
             var cam = aimCamera ? aimCamera : Camera.main;
             if (!cam) return;
@@ -59,7 +60,7 @@ namespace Vanta.Combat
             if (reloading || !weapon || AmmoInMagazine >= weapon.magazineSize) yield break;
             reloading = true;
             yield return new WaitForSeconds(weapon.reloadSeconds);
-            AmmoInMagazine = weapon.magazineSize;
+            ammoState.Reload();
             reloading = false;
         }
     }
