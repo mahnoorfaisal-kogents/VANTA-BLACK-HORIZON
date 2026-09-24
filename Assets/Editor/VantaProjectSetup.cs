@@ -145,6 +145,8 @@ namespace Vanta.EditorTools
             saveSo.FindProperty("progression").objectReferenceValue = world.GetComponent<ProgressionSystem>();
             saveSo.FindProperty("worldTime").objectReferenceValue = world.GetComponent<WorldTimeSystem>();
             saveSo.FindProperty("missions").objectReferenceValue = world.GetComponent<MissionSystem>();
+            saveSo.FindProperty("missionDefinitions").arraySize = 1;
+            saveSo.FindProperty("missionDefinitions").GetArrayElementAtIndex(0).objectReferenceValue = mission;
             saveSo.ApplyModifiedPropertiesWithoutUndo();
             var camera = CreateCamera(player);
             ConfigureWeapon(player.GetComponent<WeaponController>(), player.transform.Find("Muzzle"), camera.GetComponent<Camera>());
