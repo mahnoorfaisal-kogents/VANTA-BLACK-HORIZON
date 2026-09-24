@@ -53,7 +53,7 @@ namespace Vanta.Vehicles
 
         public void Repair(float amount)
         {
-            if (damageState == null || IsDestroyed) return;
+            if (damageState == null) return;
             damageState.Repair(amount);
         }
 
