@@ -6,7 +6,7 @@ namespace Vanta.AI
     {
         public EnemyState Current { get; private set; } = EnemyState.Idle;
 
-        public bool Transition(EnemyState next)
+        public bool TryTransition(EnemyState next)
         {
             if (Current == next) return true;
             if (Current == EnemyState.Dead) return false;
@@ -33,5 +33,7 @@ namespace Vanta.AI
             Current = next;
             return true;
         }
+
+        public bool Transition(EnemyState next) => TryTransition(next);
     }
 }
