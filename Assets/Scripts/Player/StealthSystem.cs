@@ -1,2 +1,2 @@
 using UnityEngine;
-namespace Vanta.Player{public sealed class StealthSystem:MonoBehaviour{[SerializeField,Range(0,1)]float visibility=1f;public float Visibility=>visibility;public bool IsCrouched{get;private set;}void Update(){IsCrouched=Input.GetKey(KeyCode.LeftControl)||Input.GetKey(KeyCode.C);visibility=Mathf.Lerp(visibility,IsCrouched?.45f:1f,Time.deltaTime*8f);}}}
+namespace Vanta.Player{public sealed class StealthSystem:MonoBehaviour{[SerializeField,Range(0,1)]float visibility=1f;public float Visibility=>visibility;public bool IsCrouched{get;private set;}void Update(){IsCrouched=Input.GetKey(KeyCode.LeftControl)||Input.GetKey(KeyCode.C);visibility=Mathf.Lerp(visibility,IsCrouched ? .45f : 1f,Time.deltaTime*8f);}}}
