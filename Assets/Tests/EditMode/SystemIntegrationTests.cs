@@ -67,5 +67,17 @@ namespace Vanta.Tests
             Assert.That(c.Escalation, Is.EqualTo(PoliceEscalationLevel.Major));
             Assert.That(c.PursuitState, Is.EqualTo(PursuitState.Intercepting));
         }
+        [Test] public void ConsequenceModelAppliesAllGameplayState()
+        {
+            var m = new GameplayConsequenceModel();
+            m.Apply(new MissionConsequence { cash = 500, factionId = "iron_jackals", reputationDelta = 20, territoryId = "dock", territoryDelta = 15, wantedHeat = 0.5f, revealIds = new[]{"safehouse-1"}, xp = 250 });
+            Assert.That(m.Cash, Is.EqualTo(500));
+            Assert.That(m.GetReputation("iron_jackals"), Is.EqualTo(20));
+            Assert.That(m.GetTerritoryInfluence("dock"), Is.EqualTo(15));
+            Assert.That(m.WantedHeat, Is.EqualTo(0.5f).Within(0.001f));
+            Assert.That(m.Xp, Is.EqualTo(250));
+            Assert.That(m.IsRevealed("safehouse-1"), Is.True);
+        }
+
     }
 }
