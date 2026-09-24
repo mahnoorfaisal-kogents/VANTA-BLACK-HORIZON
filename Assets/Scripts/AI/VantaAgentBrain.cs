@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Vanta.AI
 {
-    /// <summary>Lightweight adapter for deterministic agent intelligence. Movement/combat remain owned by specialist controllers.</summary>
+    /// <summary>Lightweight adapter for deterministic agent intelligence. Specialist controllers remain authoritative for movement/combat.</summary>
     public sealed class VantaAgentBrain : MonoBehaviour
     {
         [SerializeField, Min(1)] int memoryCapacity = 32;
@@ -13,6 +13,8 @@ namespace Vanta.AI
         [SerializeField] bool enabledBrain = true;
 
         AgentOrchestrator orchestrator;
+        AgentTelemetry telemetry;
+        AIFrameBudgetSystem frameBudget;
         Transform player;
         float accumulator;
         int tick;
@@ -20,27 +22,33 @@ namespace Vanta.AI
         public AgentAction LastAction => orchestrator?.Actions.LastAction ?? AgentAction.Idle;
         public AgentMemoryStore Memory => orchestrator?.Memory;
         public AgentKnowledgeBase Knowledge => orchestrator?.Knowledge;
+        public AgentTelemetry Telemetry => telemetry;
 
         void Awake()
         {
             orchestrator = new AgentOrchestrator(memoryCapacity);
+            telemetry = new AgentTelemetry();
             player = GameObject.FindGameObjectWithTag("Player")?.transform;
+            frameBudget = FindObjectOfType<AIFrameBudgetSystem>();
         }
 
         void Update()
         {
             if (!enabledBrain || ticksPerSecond <= 0) return;
-            if (!player) player = GameObject.FindGameObjectWithTag("Player")?.transform;
             accumulator += Time.deltaTime;
             var interval = 1f / ticksPerSecond;
             if (accumulator < interval) return;
             accumulator %= interval;
+
+            if (frameBudget && !frameBudget.TryAcquire(this, 0.5f)) return;
             Evaluate();
         }
 
         void Evaluate()
         {
             if (!orchestrator) return;
+            if (!player) player = GameObject.FindGameObjectWithTag("Player")?.transform;
+
             var hasTarget = player != null;
             var playerVisible = false;
             var threat = 0f;
@@ -54,7 +62,8 @@ namespace Vanta.AI
 
             var context = new AgentContextSnapshot(++tick, threat, curiosity, socialNeed,
                 hasTarget, playerVisible, true);
-            orchestrator.Tick(context);
+            var action = orchestrator.Tick(context);
+            telemetry.Record(new AgentDecisionTrace(tick, action, threat));
         }
     }
 }
