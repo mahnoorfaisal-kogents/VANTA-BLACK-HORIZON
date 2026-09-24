@@ -84,4 +84,37 @@ public sealed class AdvancedAIAgentSystemTests
         Assert.LessOrEqual(pressure, 1f);
         Assert.AreEqual(pressure, director.CalculatePressure(0.8f, 0.2f, 0.6f), 0.0001f);
     }
+    [Test]
+    public void TacticalSystemMapsThreatToDeterministicGoal()
+    {
+        var context = new AgentTacticalContext(0.9f, 0.8f, 0.1f, true, true, true);
+        var result = AgentTacticalSystem.Evaluate(context);
+
+        Assert.AreEqual(AgentTacticalGoal.Survive, result.Goal);
+        Assert.AreEqual(AgentAction.Flee, result.Action);
+    }
+
+    [Test]
+    public void TacticalSystemUsesInvestigationWhenTargetIsNotVisible()
+    {
+        var context = new AgentTacticalContext(0.2f, 0.9f, 0.2f, true, false, true);
+        var result = AgentTacticalSystem.Evaluate(context);
+
+        Assert.AreEqual(AgentTacticalGoal.Investigate, result.Goal);
+        Assert.AreEqual(AgentAction.Investigate, result.Action);
+    }
+
+    [Test]
+    public void TacticalSystemProducesBoundedDeterministicScores()
+    {
+        var context = new AgentTacticalContext(0.55f, 0.35f, 0.65f, true, true, true);
+        var first = AgentTacticalSystem.Evaluate(context);
+        var second = AgentTacticalSystem.Evaluate(context);
+
+        Assert.AreEqual(first.Goal, second.Goal);
+        Assert.AreEqual(first.Action, second.Action);
+        Assert.GreaterOrEqual(first.GoalUtility, 0f);
+        Assert.LessOrEqual(first.GoalUtility, 1f);
+    }
+
 }
