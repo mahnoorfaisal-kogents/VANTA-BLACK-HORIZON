@@ -3,11 +3,27 @@ using UnityEngine;
 
 namespace Vanta.Systems
 {
-    /// <summary>
-    /// Central lightweight performance policy for the vertical slice.
-    /// It applies the configured frame-rate target and exposes deterministic
-    /// population-budget checks so spawning systems can remain bounded.
-    /// </summary>
+    /// <summary>Deterministic, allocation-free population policy shared by world spawners.</summary>
+    public readonly struct PerformanceBudgetPolicy
+    {
+        public int TargetFrameRate { get; }
+        public int MaxActiveTraffic { get; }
+        public int MaxActiveCivilians { get; }
+
+        public PerformanceBudgetPolicy(int maxActiveTraffic, int maxActiveCivilians, int targetFrameRate = 60)
+        {
+            TargetFrameRate = Mathf.Max(1, targetFrameRate);
+            MaxActiveTraffic = Mathf.Max(0, maxActiveTraffic);
+            MaxActiveCivilians = Mathf.Max(0, maxActiveCivilians);
+        }
+
+        public bool CanSpawnTraffic(int activeTraffic) => activeTraffic >= 0 && activeTraffic < MaxActiveTraffic;
+        public bool CanSpawnCivilian(int activeCivilians) => activeCivilians >= 0 && activeCivilians < MaxActiveCivilians;
+        public bool IsWithinBudget(int activeTraffic, int activeCivilians) =>
+            activeTraffic >= 0 && activeCivilians >= 0 &&
+            activeTraffic <= MaxActiveTraffic && activeCivilians <= MaxActiveCivilians;
+    }
+
     public sealed class PerformanceBudgetSystem : MonoBehaviour
     {
         [SerializeField, Min(1)] int targetFrameRate = 60;
@@ -19,13 +35,10 @@ namespace Vanta.Systems
         public int MaxActiveTraffic => maxActiveTraffic;
         public int MaxActiveCivilians => maxActiveCivilians;
         public bool ApplyFrameRateTarget => applyFrameRateTarget;
-
+        public PerformanceBudgetPolicy Policy => new(maxActiveTraffic, maxActiveCivilians, targetFrameRate);
         public event Action<string> BudgetWarning;
 
-        void OnEnable()
-        {
-            ApplyFrameRate();
-        }
+        void OnEnable() => ApplyFrameRate();
 
         void OnValidate()
         {
@@ -37,26 +50,12 @@ namespace Vanta.Systems
 
         public void ApplyFrameRate()
         {
-            if (!applyFrameRateTarget) return;
-            Application.targetFrameRate = Mathf.Max(1, targetFrameRate);
+            if (applyFrameRateTarget) Application.targetFrameRate = Mathf.Max(1, targetFrameRate);
         }
 
-        public bool CanSpawnTraffic(int activeTraffic)
-        {
-            return activeTraffic >= 0 && activeTraffic < maxActiveTraffic;
-        }
-
-        public bool CanSpawnCivilian(int activeCivilians)
-        {
-            return activeCivilians >= 0 && activeCivilians < maxActiveCivilians;
-        }
-
-        public bool IsWithinBudget(int activeTraffic, int activeCivilians)
-        {
-            return activeTraffic >= 0 && activeCivilians >= 0 &&
-                   activeTraffic <= maxActiveTraffic &&
-                   activeCivilians <= maxActiveCivilians;
-        }
+        public bool CanSpawnTraffic(int activeTraffic) => Policy.CanSpawnTraffic(activeTraffic);
+        public bool CanSpawnCivilian(int activeCivilians) => Policy.CanSpawnCivilian(activeCivilians);
+        public bool IsWithinBudget(int activeTraffic, int activeCivilians) => Policy.IsWithinBudget(activeTraffic, activeCivilians);
 
         public void Report(int activeTraffic, int activeCivilians)
         {
