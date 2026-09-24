@@ -46,9 +46,20 @@ namespace Vanta.AI
         public event Action<string, int> ContextualEventRequested;
         public event Action<string, WorldEventState> ContextualEventStateChanged;
 
+        public void Initialize(WantedSystem wantedSystem, WorldEventSystem eventSystem)
+        {
+            wanted = wantedSystem;
+            worldEvents = eventSystem;
+            if (model == null)
+                model = new WorldSimulationDirector(seed);
+            if (!player)
+                player = GameObject.FindGameObjectWithTag("Player")?.transform;
+        }
+
         void Awake()
         {
-            model = new WorldSimulationDirector(seed);
+            if (model == null)
+                model = new WorldSimulationDirector(seed);
             player = GameObject.FindGameObjectWithTag("Player")?.transform;
             cooldown = 0f;
         }
