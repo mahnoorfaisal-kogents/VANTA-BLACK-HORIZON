@@ -81,28 +81,39 @@ namespace Vanta.Missions
         {
             if (snapshot == null) return false;
             var lookup = new Dictionary<string, MissionDefinition>();
+            var ambiguousIds = new HashSet<string>();
             foreach (var definition in definitions ?? Array.Empty<MissionDefinition>())
-                if (definition && !string.IsNullOrWhiteSpace(definition.missionId))
-                    lookup[definition.missionId] = definition;
+            {
+                if (!definition || string.IsNullOrWhiteSpace(definition.missionId)) continue;
+                if (ambiguousIds.Contains(definition.missionId)) continue;
+                if (!lookup.TryAdd(definition.missionId, definition))
+                {
+                    lookup.Remove(definition.missionId);
+                    ambiguousIds.Add(definition.missionId);
+                }
+            }
 
             missions.Clear();
             var restoredIds = new HashSet<string>();
             foreach (var saved in snapshot)
             {
                 if (saved == null || string.IsNullOrWhiteSpace(saved.id) ||
-                    !restoredIds.Add(saved.id) || !lookup.TryGetValue(saved.id, out var definition))
+                    !restoredIds.Add(saved.id) || ambiguousIds.Contains(saved.id) ||
+                    !lookup.TryGetValue(saved.id, out var definition))
                     continue;
 
-                var runtime = new RuntimeMission
+                var graph = new MissionObjectiveGraph();
+                if (!graph.TryBuild(definition.objectiveGraph)) continue;
+                graph.RestoreStatuses(saved.objectives);
+
+                missions.Add(saved.id, new RuntimeMission
                 {
                     id = saved.id,
                     status = (Status)Mathf.Clamp(saved.status, (int)Status.Inactive, (int)Status.Failed),
                     objectiveIndex = Mathf.Max(0, saved.objectiveIndex),
+                    graph = graph,
                     consequence = definition.consequence
-                };
-                runtime.graph.Build(definition.objectiveGraph);
-                runtime.graph.RestoreStatuses(saved.objectives);
-                missions[runtime.id] = runtime;
+                });
             }
 
             return true;
@@ -111,14 +122,16 @@ namespace Vanta.Missions
         public bool StartMission(MissionDefinition def)
         {
             if (!def || string.IsNullOrWhiteSpace(def.missionId) || missions.ContainsKey(def.missionId)) return false;
-            var runtime = new RuntimeMission
+            var graph = new MissionObjectiveGraph();
+            if (!graph.TryBuild(def.objectiveGraph)) return false;
+
+            missions.Add(def.missionId, new RuntimeMission
             {
                 id = def.missionId,
                 status = Status.Active,
+                graph = graph,
                 consequence = def.consequence
-            };
-            runtime.graph.Build(def.objectiveGraph);
-            missions.Add(def.missionId, runtime);
+            });
             StatusChanged?.Invoke(def.missionId, Status.Active);
             return true;
         }
