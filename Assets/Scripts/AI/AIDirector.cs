@@ -111,7 +111,36 @@ namespace Vanta.AI
 
         public AIDirectorResult Evaluate(float wantedHeat, float playerVisibility, float instability)
         {
-            return model.Evaluate(wantedHeat, playerVisibility, instability);
+            if (model == null)
+                model = new WorldSimulationDirector(seed);
+            return model.Evaluate(
+                Mathf.Clamp01(wantedHeat),
+                Mathf.Clamp01(playerVisibility),
+                Mathf.Clamp01(instability));
+        }
+
+        void OnDisable()
+        {
+            StopActiveEvent();
+            Pressure = 0f;
+            EventTier = 0;
+            cooldown = 0f;
+            activeRemaining = 0f;
+            player = null;
+        }
+
+        void StopActiveEvent()
+        {
+            if (activeRuntime == null) return;
+
+            if (worldEvents != null && !string.IsNullOrEmpty(activeEventId))
+            {
+                if (worldEvents.Fail(activeEventId, activeRuntime))
+                    ContextualEventStateChanged?.Invoke(activeEventId, WorldEventState.Failed);
+            }
+
+            activeRuntime = null;
+            activeEventId = null;
         }
     }
 }
