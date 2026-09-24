@@ -79,5 +79,21 @@ namespace Vanta.Tests
             Assert.That(m.IsRevealed("safehouse-1"), Is.True);
         }
 
+        [Test] public void MissionGraphBuildDoesNotMutateDefinitionNodes()
+        {
+            var source = new[]
+            {
+                new MissionObjectiveNode { id="a", title="A" },
+                new MissionObjectiveNode { id="b", title="B", prerequisites=new[]{"a"} }
+            };
+            var graph = new MissionObjectiveGraph();
+            graph.Build(source);
+            graph.SetActive("a");
+            graph.Complete("a");
+            Assert.That(source[0].status, Is.EqualTo(ObjectiveStatus.Locked));
+            Assert.That(source[1].status, Is.EqualTo(ObjectiveStatus.Locked));
+            Assert.That(graph.Nodes["b"].status, Is.EqualTo(ObjectiveStatus.Available));
+        }
+
     }
 }
