@@ -27,7 +27,7 @@ namespace Vanta.AI
         }
     }
 
-    /// <summary>Reusable perception-to-decision orchestration without requiring an LLM.</summary>
+    /// <summary>Reusable perception-to-tactical-decision orchestration without requiring an LLM.</summary>
     public sealed class AgentOrchestrator
     {
         public AgentMemoryStore Memory { get; }
@@ -51,14 +51,30 @@ namespace Vanta.AI
                 return AgentAction.Idle;
             }
 
-            var decision = AgentDecisionSystem.Choose(new AgentDecisionContext(
-                context.Threat, context.Curiosity, context.SocialNeed,
-                context.HasTarget, context.PlayerVisible));
+            var tactical = AgentTacticalSystem.Evaluate(new AgentTacticalContext(
+                context.Threat,
+                context.PlayerVisible ? 1f : context.Curiosity,
+                context.SocialNeed,
+                context.HasTarget,
+                context.PlayerVisible,
+                context.Alive));
 
+            Goals.AddOrUpdate(new AgentGoal("survive", context.Threat));
+            Goals.AddOrUpdate(new AgentGoal("pursue", context.PlayerVisible && context.HasTarget ? tactical.GoalUtility : 0f));
+            Goals.AddOrUpdate(new AgentGoal("investigate", context.HasTarget && !context.PlayerVisible ? tactical.GoalUtility : 0f));
+            Goals.AddOrUpdate(new AgentGoal("assist", context.SocialNeed * (1f - context.Threat * 0.5f)));
+            Goals.AddOrUpdate(new AgentGoal("patrol", 0.25f));
+
+            var decision = tactical.Action;
             Actions.TryExecute(decision, true);
             Memory.Remember("last_action", decision.ToString(), 0.35f, context.Tick);
+            Memory.Remember("last_goal", tactical.Goal.ToString(), 0.55f, context.Tick);
+
             if (context.PlayerVisible)
                 Memory.Remember("player_seen", "player visible at tick " + context.Tick, 0.8f, context.Tick);
+            else if (context.HasTarget)
+                Memory.Remember("player_lost", "target not visible at tick " + context.Tick, 0.65f, context.Tick);
+
             return decision;
         }
     }
