@@ -26,8 +26,18 @@ namespace Vanta.Missions
         {
             nodes.Clear();
             foreach (var node in source ?? Array.Empty<MissionObjectiveNode>())
-                if (node != null && !string.IsNullOrWhiteSpace(node.id))
-                    nodes[node.id] = node;
+            {
+                if (node == null || string.IsNullOrWhiteSpace(node.id)) continue;
+                nodes[node.id] = new MissionObjectiveNode
+                {
+                    id = node.id,
+                    title = node.title,
+                    prerequisites = node.prerequisites == null ? Array.Empty<string>() : (string[])node.prerequisites.Clone(),
+                    approaches = node.approaches == null ? Array.Empty<string>() : (string[])node.approaches.Clone(),
+                    status = ObjectiveStatus.Locked,
+                    Optional = node.Optional
+                };
+            }
             RefreshAvailability();
         }
 
