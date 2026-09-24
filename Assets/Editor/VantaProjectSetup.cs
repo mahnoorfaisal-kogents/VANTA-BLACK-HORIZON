@@ -80,6 +80,7 @@ namespace Vanta.EditorTools
             world.AddComponent<WorldTimeSystem>();
             world.AddComponent<WeatherSystem>();
             world.AddComponent<WorldEventDirector>();
+            world.AddComponent<DiscoverySystem>();
             world.AddComponent<WantedSystem>();
             world.AddComponent<FactionSystem>();
             world.AddComponent<InventorySystem>();
@@ -92,6 +93,8 @@ namespace Vanta.EditorTools
             var camera = CreateCamera(player.transform);
             ConfigureWeapon(player.GetComponent<WeaponController>(), player.transform.Find("Muzzle"), camera.GetComponent<Camera>());
             CreateEnemy(player.transform);
+            CreatePolice(player.transform, world.GetComponent<WantedSystem>());
+            CreateDiscoveryPoints();
             CreateCivilians();
             CreateVehicles();
 
@@ -114,6 +117,7 @@ namespace Vanta.EditorTools
         {
             var go = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             go.name = "Player";
+            go.tag = "Player";
             go.transform.position = DistrictLayout.PlayerSpawn;
             go.transform.localScale = new Vector3(0.9f, 1.1f, 0.9f);
             Object.DestroyImmediate(go.GetComponent<CapsuleCollider>());
@@ -172,6 +176,41 @@ namespace Vanta.EditorTools
             var so = new SerializedObject(ai);
             so.FindProperty("target").objectReferenceValue = player;
             so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void CreatePolice(Transform player, WantedSystem wanted)
+        {
+            var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            go.name = "Police_Interceptor";
+            go.transform.position = new Vector3(26f, 1f, 18f);
+            go.transform.localScale = new Vector3(1.4f, 1.2f, 2.2f);
+            var ai = go.AddComponent<PoliceAI>();
+            var so = new SerializedObject(ai);
+            so.FindProperty("wanted").objectReferenceValue = wanted;
+            so.FindProperty("target").objectReferenceValue = player;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void CreateDiscoveryPoints()
+        {
+            var points = new[]
+            {
+                new Vector3(-18f, 0.5f, -12f),
+                new Vector3(18f, 0.5f, -12f),
+                new Vector3(30f, 0.5f, 34f)
+            };
+
+            for (var i = 0; i < points.Length; i++)
+            {
+                var go = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                go.name = $"DiscoveryPoint_{i:00}";
+                go.transform.position = points[i];
+                go.transform.localScale = new Vector3(0.8f, 0.15f, 0.8f);
+                var discovery = go.AddComponent<DiscoveryPoint>();
+                var so = new SerializedObject(discovery);
+                so.FindProperty("discoveryId").stringValue = $"sector_landmark_{i:00}";
+                so.ApplyModifiedPropertiesWithoutUndo();
+            }
         }
 
         private static void CreateCivilians()
