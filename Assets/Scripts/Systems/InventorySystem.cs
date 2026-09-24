@@ -1,0 +1,2 @@
+using System.Collections.Generic;using UnityEngine;
+namespace Vanta.Systems{public sealed class InventorySystem:MonoBehaviour{readonly Dictionary<string,int> items=new();public int Count(string id)=>items.TryGetValue(id,out var n)?n:0;public void Add(string id,int amount=1){if(string.IsNullOrWhiteSpace(id)||amount<=0)return;items[id]=Count(id)+amount;}public bool Remove(string id,int amount=1){if(Count(id)<amount)return false;items[id]=Count(id)-amount;return true;}public bool Has(string id,int amount=1)=>Count(id)>=amount;}}
