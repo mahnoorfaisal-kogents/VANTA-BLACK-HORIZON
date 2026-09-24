@@ -25,22 +25,17 @@ namespace Vanta.Core
         public bool PauseGame()
         {
             if (!SetState(GameplayState.Paused)) return false;
-            Time.timeScale = 0f;
             return true;
         }
 
         public bool ResumeGame()
         {
-            if (!SetState(GameplayState.Playing)) return false;
-            Time.timeScale = 1f;
-            return true;
+            return SetState(GameplayState.Playing);
         }
 
         public bool MarkDead()
         {
-            if (!SetState(GameplayState.Dead)) return false;
-            Time.timeScale = 0f;
-            return true;
+            return SetState(GameplayState.Dead);
         }
 
         public bool RestartPlayer()
@@ -50,15 +45,13 @@ namespace Vanta.Core
             return SetState(GameplayState.Playing);
         }
 
-        bool SetState(GameplayState next)
-        {
-            var changed = stateService.TrySet(next);
-            if (changed && next != GameplayState.Paused && next != GameplayState.Dead)
-                Time.timeScale = 1f;
-            return changed;
-        }
+        bool SetState(GameplayState next) => stateService.TrySet(next);
 
-        void OnStateChanged(GameplayState previous, GameplayState next) => StateChanged?.Invoke(previous, next);
+        void OnStateChanged(GameplayState previous, GameplayState next)
+        {
+            Time.timeScale = next == GameplayState.Paused || next == GameplayState.Dead ? 0f : 1f;
+            StateChanged?.Invoke(previous, next);
+        }
 
         private void OnDestroy()
         {
