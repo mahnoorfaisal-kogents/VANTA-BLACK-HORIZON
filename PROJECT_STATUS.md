@@ -1,41 +1,55 @@
 # VANTA: BLACK HORIZON — Development Status
 
 ## Repository checkpoint
-
 - Default branch: main
 - Active implementation branch: dev/core-gameplay-foundation
-- Current work starts from an intentionally minimal repository.
-- No claim is made that a Unity scene/build has been runtime-verified from GitHub alone.
+- Latest implementation checkpoint is on the development branch.
+- Unity version: 2022.3.62f1
+- main has not been used for implementation changes.
+- Runtime Play Mode/build verification is still pending.
 
-## Implemented in this checkpoint
+## Research completed
+A gameplay reference comparison was added at Docs/GAMEPLAY_REFERENCE_COMPARISON.md, covering representative systems from GTA V, Red Dead Redemption 2, Cyberpunk 2077/Phantom Liberty, Watch Dogs 2, Far Cry 6, Assassin's Creed Shadows, Call of Duty: Black Ops 6 and Need for Speed Heat/Unbound.
 
-- Unity 2022.3 project/package metadata
-- Damage contract (IDamageable)
-- Health/armor/death events
-- Player movement: walk, sprint, crouch, jump, gravity, grounded handling, stamina
-- Third-person mouse camera follow/look
-- Data-driven weapon definition
-- Hitscan weapon firing, magazine, fire-rate gate, reload, damage application
-- Enemy state model and baseline detection/chase/death transitions
-- Game session state model
-- Runtime/test assembly definitions
-- EditMode tests for enemy state transitions
+## Latest implementation
+- Camera-relative movement utility + regression tests
+- Player camera-relative movement and smooth rotation
+- Crouch capsule transition
+- Third-person aim/FOV and collision
+- Player camera auto-binding helper
+- Weapon type taxonomy
+- Weapon spread and pellet support
+- Enemy chase/combat/damage/death loop
+- Unity 2022.3-compatible Input System, Cinemachine, AI Navigation and Animation Rigging packages
 
-## Explicitly not yet verified
-
-- Unity Editor import
-- Scene wiring
-- Prefab wiring
-- Play Mode runtime
-- Actual damage hit in a built scene
-- Windows executable build
-- Full AI combat/cover/pathfinding
-- Vehicles, traffic, police/wanted, missions, factions, economy, save/load, world streaming, weather and advanced UI
+## Major-system status
+| System | Status |
+|---|---|
+| Player locomotion | PARTIAL — source implemented; runtime pending |
+| Camera | PARTIAL — source implemented; runtime pending |
+| Combat | PARTIAL — source implemented; runtime pending |
+| Enemy AI | PARTIAL — source implemented; navigation runtime pending |
+| HUD | MISSING |
+| Menus | MISSING |
+| Civilian AI | MISSING |
+| Stealth | MISSING |
+| Parkour | MISSING |
+| Vehicles/traffic | MISSING |
+| Police/wanted | MISSING |
+| Missions | MISSING |
+| Factions | MISSING |
+| Economy/inventory | MISSING |
+| Map/minimap | MISSING |
+| World events | MISSING |
+| Day/night/weather | MISSING |
+| World streaming | MISSING |
+| Save/load | MISSING |
+| Cinematics | PARTIAL — Timeline package exists |
+| Performance | PARTIAL — profiling work pending |
 
 ## Next gate
+Build and wire a minimal playable test district, then verify:
 
-Open the project in Unity, create/wire the first playable scene, run the EditMode tests, then verify the core loop:
+Main Menu -> New Game -> Player -> Camera -> Move -> Aim -> Fire -> Enemy Damage -> Enemy Death -> Enemy Attack -> Player Damage -> Player Death -> Restart
 
-Start -> Player moves -> Camera follows -> Aim -> Fire -> Enemy takes damage -> Enemy dies -> Player can be damaged -> Player death/restart
-
-Only after that gate passes should vehicles/police/missions and open-world streaming be layered on.
+Only after this runtime gate is demonstrated should vehicle/police systems be expanded.
