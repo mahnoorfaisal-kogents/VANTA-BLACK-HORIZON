@@ -86,9 +86,11 @@ namespace Vanta.Missions
                     lookup[definition.missionId] = definition;
 
             missions.Clear();
+            var restoredIds = new HashSet<string>();
             foreach (var saved in snapshot)
             {
-                if (saved == null || string.IsNullOrWhiteSpace(saved.id) || !lookup.TryGetValue(saved.id, out var definition))
+                if (saved == null || string.IsNullOrWhiteSpace(saved.id) ||
+                    !restoredIds.Add(saved.id) || !lookup.TryGetValue(saved.id, out var definition))
                     continue;
 
                 var runtime = new RuntimeMission
@@ -108,7 +110,7 @@ namespace Vanta.Missions
 
         public bool StartMission(MissionDefinition def)
         {
-            if (!def || string.IsNullOrWhiteSpace(def.missionId)) return false;
+            if (!def || string.IsNullOrWhiteSpace(def.missionId) || missions.ContainsKey(def.missionId)) return false;
             var runtime = new RuntimeMission
             {
                 id = def.missionId,
@@ -116,7 +118,7 @@ namespace Vanta.Missions
                 consequence = def.consequence
             };
             runtime.graph.Build(def.objectiveGraph);
-            missions[def.missionId] = runtime;
+            missions.Add(def.missionId, runtime);
             StatusChanged?.Invoke(def.missionId, Status.Active);
             return true;
         }
