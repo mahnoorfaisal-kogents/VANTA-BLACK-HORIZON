@@ -98,7 +98,7 @@ namespace Vanta.AI
                 var distance = brain && player ? Vector3.Distance(brain.transform.position, player.position) : 999f;
                 var visible = brain && player && distance <= 30f;
                 var threat = brain ? Mathf.Clamp01(1f - distance / 30f) : 0f;
-                var leaderVisible = player && CurrentAssignments.Count > 0;
+                var leaderVisible = player != null && CurrentAssignments.Count > 0;
                 return new SquadCommandContext(role, threat, distance, visible, CurrentAssignments.Count > 0, leaderVisible);
             });
         }
