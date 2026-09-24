@@ -121,3 +121,13 @@ No runtime-complete or build-complete claim should be made until Unity actually 
 - Added EditMode regression coverage for squad command arbitration, leader-missing regroup behavior, knowledge propagation, and coordinator capacity/clear behavior.
 - Source-level implementation for this consolidated AI phase: IMPLEMENTED on `main`.
 - Unity Editor compile, EditMode execution, Play Mode, NavMesh, build, and target-hardware profiling remain UNVERIFIED because no Unity runtime/Editor execution environment was available here.
+
+## Consolidated playable-slice completion pass — source implementation
+- Generated vertical-slice pipeline now creates `FirstContact` mission content with three sequential objectives and systemic consequences.
+- Added `VerticalSliceMissionBootstrap` and `MissionObjectiveTrigger` so the generated district has an actual objective progression path rather than only mission framework APIs.
+- Generated district now wires `AIDirector`, squad coordination, squad knowledge sharing, mission bootstrap, and mission save definitions.
+- Fixed an editor setup compile issue where `CreateCamera` expected a `GameObject` but received `Transform`.
+- Existing main menu, HUD, pause/settings, save/load, combat, movement, vehicles, world simulation, population, faction, wanted, AI and streaming foundations remain wired through the generated scene.
+- Source implementation pass: IMPLEMENTED.
+- GitHub Actions currently has zero workflow runs for this repository; therefore no CI/Unity execution evidence exists.
+- Unity Editor import/compile, Test Runner execution, Play Mode, NavMesh runtime, mission runtime, vehicle runtime, performance profiling, and Windows `.exe` build remain UNVERIFIED. These require an actual Unity Editor/CI execution environment and cannot truthfully be marked complete from source inspection alone.
