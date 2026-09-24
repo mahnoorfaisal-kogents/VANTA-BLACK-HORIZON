@@ -54,6 +54,16 @@ namespace Vanta.AI
             timer -= Time.deltaTime;
             if (timer > 0f) return;
             timer = Mathf.Max(0.1f, refreshSeconds);
+            coordinator.Clear();
+            var brains = GetComponentsInChildren<VantaAgentBrain>(true);
+            var player = GameObject.FindGameObjectWithTag("Player")?.transform;
+            for (var i = 0; i < brains.Length; i++)
+            {
+                if (!brains[i] || (player && brains[i].transform == player)) continue;
+                var distance = player ? Vector3.Distance(transform.position, player.position) : 0f;
+                var priority = Mathf.Clamp01(1f - distance / 100f) + (brains[i].LastAction == AgentAction.Pursue ? 0.2f : 0f);
+                coordinator.Add(brains[i].GetInstanceID(), Mathf.Clamp01(priority));
+            }
             CurrentAssignments = coordinator.BuildAssignments();
         }
 
