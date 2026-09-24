@@ -1,0 +1,61 @@
+name: VANTA Project Integrity
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate required project files
+        shell: bash
+        run: |
+          set -euo pipefail
+          required=(
+            "Assets/Editor/VantaProjectSetup.cs"
+            "Assets/Scripts/AI/AIDirector.cs"
+            "Assets/Scripts/AI/AgentOrchestrator.cs"
+            "Assets/Scripts/AI/AgentSquadCoordinator.cs"
+            "Assets/Scripts/AI/AgentSquadCommandSystem.cs"
+            "Assets/Scripts/AI/AgentSquadKnowledgeCoordinator.cs"
+            "Assets/Scripts/Missions/MissionSystem.cs"
+            "Assets/Scripts/Missions/VerticalSliceMissionBootstrap.cs"
+            "Assets/Scripts/Missions/MissionObjectiveTrigger.cs"
+            "Assets/Scripts/Save/SaveGameCoordinator.cs"
+            "Assets/Scripts/World/DistrictStreamingSystem.cs"
+            "Assets/Scripts/Systems/PerformanceBudgetSystem.cs"
+            ".github/workflows/unity-windows-build.yml"
+          )
+          for file in "${required[@]}"; do
+            test -f "$file" || { echo "Missing required file: $file"; exit 1; }
+          done
+
+      - name: Validate generated-slice wiring
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'BuildPlayableVerticalSlice' Assets/Editor/VantaProjectSetup.cs
+          grep -q 'CreateMissionAsset' Assets/Editor/VantaProjectSetup.cs
+          grep -q 'CreateMissionRuntime' Assets/Editor/VantaProjectSetup.cs
+          grep -q 'AddComponent<AIDirector>' Assets/Editor/VantaProjectSetup.cs
+          grep -q 'AddComponent<AgentSquadCoordinatorComponent>' Assets/Editor/VantaProjectSetup.cs
+          grep -q 'missionDefinitions' Assets/Editor/VantaProjectSetup.cs
+
+      - name: Reject obvious destructive git commands
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git grep -nE 'git (reset --hard|clean -fd|push --force|push -f)' -- ':!PROJECT_STATUS.md'; then
+            echo "Potential destructive git command found in tracked source."
+            exit 1
+          fi
+
+      - name: Integrity gate passed
+        run: echo "VANTA project integrity checks passed."
