@@ -12,6 +12,13 @@ Gameplay-system comparison is documented in `Docs/GAMEPLAY_REFERENCE_COMPARISON.
 
 ## Implemented foundations
 
+### Playable vertical-slice generation
+- Editor command `VANTA/Build Playable Vertical Slice`
+- Generates original `MainMenu` and `PlayableDistrict` scenes under `Assets/Generated`
+- Generates environment materials and five weapon ScriptableObject assets
+- Generates player, camera, enemy, civilians, vehicles, HUD and world-system wiring
+- Configures Unity Build Settings with both generated scenes
+
 ### Core
 - Health/armor/death contract
 - Gameplay session states
@@ -59,7 +66,7 @@ Gameplay-system comparison is documented in `Docs/GAMEPLAY_REFERENCE_COMPARISON.
 Unity 2022.3-compatible packages currently include Input System 1.6.1, Cinemachine 2.9.7, AI Navigation 1.1.4 and Animation Rigging 1.2.1.
 
 ## Not yet complete
-- Actual Unity scene/prefab wiring
+- Runtime-generated/editor-created scene assets have an automated setup path; generated files are not yet runtime-verified
 - Play Mode verification
 - Windows build verification
 - NavMesh baked test district
@@ -79,7 +86,7 @@ Unity 2022.3-compatible packages currently include Input System 1.6.1, Cinemachi
 - Cinematic Timeline integration
 - Full HUD/menus/settings
 - LOD/pooling/culling/profiling pass
-- Full asset/content production
+- Full asset/content production beyond the procedural vertical-slice starter pack
 
 ## Quality gate
 The next acceptance gate is a real playable district:
