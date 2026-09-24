@@ -32,7 +32,8 @@ namespace Vanta.EditorTools
 
             CreateWeaponAssets();
             var menu = CreateMainMenu();
-            var district = CreateDistrict();
+            var mission = CreateMissionAsset();
+            var district = CreateDistrict(mission);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
@@ -58,7 +59,7 @@ namespace Vanta.EditorTools
             return scene;
         }
 
-        private static Scene CreateDistrict()
+        private static Scene CreateDistrict(MissionDefinition mission)
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
@@ -88,6 +89,9 @@ namespace Vanta.EditorTools
             world.AddComponent<DistrictStreamingSystem>();
             world.AddComponent<PerformanceBudgetSystem>();
             world.AddComponent<AIFrameBudgetSystem>();
+            world.AddComponent<AIDirector>();
+            world.AddComponent<AgentSquadCoordinatorComponent>();
+            world.AddComponent<AgentSquadKnowledgeCoordinator>();
             world.AddComponent<VantaSettingsSystem>();
             world.AddComponent<ActivitySystem>();
             world.AddComponent<InteractionSystem>();
@@ -145,6 +149,8 @@ namespace Vanta.EditorTools
             CreateCivilians();
             CreateVehicles();
             navSurface.BuildNavMesh();
+
+            CreateMissionRuntime(world.transform, mission);
 
             var pause = new GameObject("PauseController");
             var pauseController = pause.AddComponent<VantaPauseController>();
@@ -245,6 +251,67 @@ namespace Vanta.EditorTools
             so.FindProperty("wanted").objectReferenceValue = wanted;
             so.FindProperty("target").objectReferenceValue = player;
             so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static MissionDefinition CreateMissionAsset()
+        {
+            var path = "Assets/Generated/Missions/FirstContact.asset";
+            EnsureFolder("Assets/Generated", "Missions");
+            var mission = AssetDatabase.LoadAssetAtPath<MissionDefinition>(path);
+            if (!mission) mission = ScriptableObject.CreateInstance<MissionDefinition>();
+            mission.missionId = "first_contact";
+            mission.title = "FIRST CONTACT";
+            mission.briefing = "Reach the marked location, inspect the signal, then extract through the safe route.";
+            mission.rewardCash = 250;
+            mission.objectiveGraph = new[]
+            {
+                new MissionObjectiveNode { id = "reach_signal", title = "Reach the signal", approaches = new[] { "stealth", "direct" } },
+                new MissionObjectiveNode { id = "inspect_signal", title = "Inspect the signal", prerequisites = new[] { "reach_signal" }, approaches = new[] { "interact" } },
+                new MissionObjectiveNode { id = "extract", title = "Extract from the district", prerequisites = new[] { "inspect_signal" }, approaches = new[] { "stealth", "direct" } }
+            };
+            mission.consequence = new MissionConsequence { cash = 250, xp = 150, factionId = "vanta", reputationDelta = 5, territoryId = "sector_01", territoryDelta = 3, wantedHeat = 0.15f, revealIds = new[] { "signal_01" } };
+            if (!AssetDatabase.Contains(mission)) AssetDatabase.CreateAsset(mission, path);
+            EditorUtility.SetDirty(mission);
+            return mission;
+        }
+
+        private static void CreateMissionRuntime(Transform parent, MissionDefinition mission)
+        {
+            var root = new GameObject("MissionRuntime");
+            root.transform.SetParent(parent);
+            var bootstrap = root.AddComponent<VerticalSliceMissionBootstrap>();
+            var system = parent.GetComponent<MissionSystem>();
+            var bootstrapSo = new SerializedObject(bootstrap);
+            bootstrapSo.FindProperty("missionSystem").objectReferenceValue = system;
+            bootstrapSo.FindProperty("missionDefinition").objectReferenceValue = mission;
+            bootstrapSo.ApplyModifiedPropertiesWithoutUndo();
+
+            var triggerSet = root.AddComponent<MissionObjectiveTriggerSet>();
+            var setSo = new SerializedObject(triggerSet);
+            setSo.FindProperty("missionSystem").objectReferenceValue = system;
+            setSo.FindProperty("missionId").stringValue = mission.missionId;
+            setSo.FindProperty("objectiveIds").arraySize = 3;
+            for (var i = 0; i < 3; i++) setSo.FindProperty("objectiveIds").GetArrayElementAtIndex(i).stringValue = mission.objectiveGraph[i].id;
+            setSo.ApplyModifiedPropertiesWithoutUndo();
+
+            var points = new[] { new Vector3(24f, 1f, 24f), new Vector3(30f, 1f, 34f), new Vector3(-18f, 1f, -12f) };
+            for (var i = 0; i < points.Length; i++)
+            {
+                var marker = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                marker.name = $"MissionObjective_{i:00}";
+                marker.transform.SetParent(root.transform);
+                marker.transform.position = points[i];
+                marker.transform.localScale = new Vector3(1.2f, 0.25f, 1.2f);
+                var collider = marker.GetComponent<Collider>();
+                collider.isTrigger = true;
+                var trigger = marker.AddComponent<MissionObjectiveTrigger>();
+                var triggerSo = new SerializedObject(trigger);
+                triggerSo.FindProperty("missionSystem").objectReferenceValue = system;
+                triggerSo.FindProperty("missionId").stringValue = mission.missionId;
+                triggerSo.FindProperty("objectiveId").stringValue = mission.objectiveGraph[i].id;
+                triggerSo.FindProperty("consumeOnComplete").boolValue = true;
+                triggerSo.ApplyModifiedPropertiesWithoutUndo();
+            }
         }
 
         private static void CreateDiscoveryPoints()
