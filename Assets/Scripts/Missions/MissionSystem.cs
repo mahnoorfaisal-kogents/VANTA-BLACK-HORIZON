@@ -21,7 +21,17 @@ namespace Vanta.Missions
         readonly Dictionary<string, RuntimeMission> missions = new();
         public event Action<string, Status> StatusChanged;
 
-        public string ActiveMissionId\n        {\n            get\n            {\n                foreach (var pair in missions)\n                    if (pair.Value.status == Status.Active) return pair.Key;\n                return null;\n            }\n        }\n\n        public Status GetStatus(string id) =>
+        public string ActiveMissionId
+        {
+            get
+            {
+                foreach (var pair in missions)
+                    if (pair.Value.status == Status.Active) return pair.Key;
+                return null;
+            }
+        }
+
+        public Status GetStatus(string id) =>
             missions.TryGetValue(id, out var m) ? m.status : Status.Inactive;
 
         public MissionConsequence GetConsequence(string id) =>
@@ -55,18 +65,21 @@ namespace Vanta.Missions
             return completed;
         }
 
-        public void CompleteMission(string id)
+        public bool CompleteMission(string id)
         {
-            if (!missions.TryGetValue(id, out var m) || m.status != Status.Active) return;
+            if (!missions.TryGetValue(id, out var m) || m.status != Status.Active) return false;
+            if (!m.graph.CanCompleteMission()) return false;
             m.status = Status.Complete;
             StatusChanged?.Invoke(id, m.status);
+            return true;
         }
 
-        public void FailMission(string id)
+        public bool FailMission(string id)
         {
-            if (!missions.TryGetValue(id, out var m) || m.status != Status.Active) return;
+            if (!missions.TryGetValue(id, out var m) || m.status != Status.Active) return false;
             m.status = Status.Failed;
             StatusChanged?.Invoke(id, m.status);
+            return true;
         }
     }
 }
