@@ -87,28 +87,15 @@ Unity 2022.3-compatible packages currently include Input System 1.6.1, Cinemachi
 - Runtime-generated scenes: generator updated, but generated scenes/NavMesh still require a real Unity Editor run for final acceptance.
 - main branch: untouched; implementation remains on dev/core-gameplay-foundation.
 
-## Not yet complete
-- Runtime-generated/editor-created scene assets have an automated setup path; generated files are not yet runtime-verified
-- Play Mode verification
-- Windows build verification
-- NavMesh baked test district
-- Full civilian schedules/perception
-- Full stealth perception/suspicion/takedowns
-- Robust parkour traversal/mantling/ledge climbing
-- Traffic AI
-- Full police dispatch/search/interception/escalation
-- Mission objective graph/checkpoints/branching
-- Faction territory/world-control gameplay
-- Full map/minimap UI
-- Safehouse/garage gameplay
-- Full day/night lighting controller
-- Weather visuals/gameplay effects
-- Additive district streaming
-- Persistent world-state serialization beyond foundation
-- Cinematic Timeline integration
-- Full HUD/menus/settings
-- LOD/pooling/culling/profiling pass
-- Full asset/content production beyond the procedural vertical-slice starter pack
+## Remaining acceptance work
+- Unity Editor import/compile verification
+- Play Mode verification of generated scenes
+- Windows x64 build and launch verification
+- Runtime tuning for NavMesh agents, traffic, NPC schedules, police, vehicles and combat
+- Full content pass: authored districts, missions, dialogue, audio, VFX, animation and art
+- Performance pass: LOD, pooling, culling, profiling and memory budgets
+- UI/HUD/settings polish and accessibility pass
+- End-to-end save/load verification with persistent world state
 
 ## Quality gate
 The next acceptance gate is a real playable district:
