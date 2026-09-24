@@ -2,6 +2,7 @@
 using System.IO;
 using UnityEditor;
 using UnityEditor.SceneManagement;
+using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Vanta.AI;
@@ -62,6 +63,8 @@ namespace Vanta.EditorTools
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
             var environment = new GameObject("Environment");
+            var navSurface = environment.AddComponent<NavMeshSurface>();
+            navSurface.collectObjects = CollectObjects.All;
             CreateCube("Ground", environment.transform, Vector3.zero, new Vector3(80f, 0.2f, 80f), GetMaterial("Ground"));
             CreateRoads(environment.transform);
             for (var i = 0; i < DistrictLayout.BuildingCount; i++)
@@ -110,6 +113,7 @@ namespace Vanta.EditorTools
             CreateDiscoveryPoints();
             CreateCivilians();
             CreateVehicles();
+            navSurface.BuildNavMesh();
 
             var hud = new GameObject("HUD");
             var hudComponent = hud.AddComponent<VantaHud>();
