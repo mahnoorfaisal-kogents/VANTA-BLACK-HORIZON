@@ -19,10 +19,16 @@ namespace Vanta.Core
         [SerializeField] EconomySystem economy;
         [SerializeField] ProgressionSystem progression;
         [SerializeField] IntelMapSystem intel;
+        [SerializeField] WorldInteractionDevice[] worldInteractionDevices;
+
+        readonly WorldInteractionModel worldInteractions = new();
 
         void Awake()
         {
             if (wanted) wanted.LevelChanged += OnWantedChanged;
+            if (worldInteractionDevices != null)
+                foreach (var device in worldInteractionDevices)
+                    if (device) device.Initialize(worldInteractions);
             if (missions) missions.StatusChanged += OnMissionStatusChanged;
         }
 
