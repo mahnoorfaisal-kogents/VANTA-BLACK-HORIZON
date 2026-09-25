@@ -428,6 +428,7 @@ namespace Vanta.EditorTools
 
                 var runtime = go.AddComponent<TrafficVehicleRuntime>();
                 runtime.Configure(trafficSystem, route.routeId);
+                runtime.ConfigurePopulation(population, id);
             }
         }
 
