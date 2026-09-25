@@ -44,10 +44,10 @@ namespace Vanta.Systems
         public bool IsEnabled(string id) =>
             devices.TryGetValue(id, out var state) && state.Enabled;
 
-        readonly struct DeviceState
+        struct DeviceState
         {
             public readonly WorldInteractionDeviceType Type;
-            public bool Enabled { get; init; }
+            public bool Enabled;
 
             public DeviceState(WorldInteractionDeviceType type, bool enabled)
             {
