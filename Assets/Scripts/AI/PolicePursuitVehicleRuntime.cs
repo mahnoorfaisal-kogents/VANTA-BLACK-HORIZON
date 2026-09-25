@@ -25,7 +25,14 @@ namespace Vanta.Vehicles
             roadblockPlanner = new RoadblockPlanner(roadblockDistance, roadblockSlots);
         }
 
-        public void SetTarget(Transform newTarget) => target = newTarget;
+        public void SetTarget(Transform newTarget)
+        {
+            if (target == newTarget)
+                return;
+
+            target = newTarget;
+            ReplanCurrentTactic();
+        }
 
         public void SetTactic(VehiclePursuitTactic tactic, int preferredSlot = 0)
         {
@@ -51,6 +58,29 @@ namespace Vanta.Vehicles
                 trafficSlots.TryReserve(CurrentRoadblock.Slot))
                 reservedSlot = CurrentRoadblock.Slot;
             else if (CurrentRoadblock.ShouldDeploy)
+                CurrentRoadblock = default;
+        }
+
+        private void ReplanCurrentTactic()
+        {
+            ReleaseRoadblockSlot();
+            CurrentRoadblock = default;
+
+            if (!target || CurrentTactic == VehiclePursuitTactic.Pursue)
+                return;
+
+            CurrentRoadblock = roadblockPlanner.Plan(
+                CurrentTactic,
+                target.position,
+                target.forward,
+                0);
+
+            if (!CurrentRoadblock.ShouldDeploy)
+                return;
+
+            if (trafficSlots && trafficSlots.TryReserve(CurrentRoadblock.Slot))
+                reservedSlot = CurrentRoadblock.Slot;
+            else
                 CurrentRoadblock = default;
         }
 
