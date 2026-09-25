@@ -9,6 +9,7 @@ namespace Vanta.AI
         [SerializeField] private WantedSystem wanted;
         [SerializeField] private Transform target;
         [SerializeField] private StealthSystem targetStealth;
+        [SerializeField] private Transform[] investigationPoints;
         [SerializeField] private float detectionRange = 35f;
         [SerializeField] private float interceptRange = 28f;
         [SerializeField] private float searchDuration = 8f;
@@ -17,11 +18,24 @@ namespace Vanta.AI
 
         private readonly PursuitStateMachine pursuit = new();
         private readonly NpcPerceptionModel perception = new();
+        private InvestigationSearchModel searchModel;
         private Vector3 lastKnownPosition;
         private float stateTimer;
         private Transform cachedTarget;
+        private Transform currentSearchPoint;
 
         public PursuitState CurrentState => pursuit.Current;
+
+        private void Awake()
+        {
+            if (investigationPoints != null && investigationPoints.Length > 0)
+            {
+                var ids = new string[investigationPoints.Length];
+                for (var i = 0; i < investigationPoints.Length; i++)
+                    ids[i] = investigationPoints[i] ? investigationPoints[i].GetInstanceID().ToString() : $"point_{i}";
+                searchModel = new InvestigationSearchModel(ids);
+            }
+        }
 
         private void Update()
         {
@@ -37,12 +51,7 @@ namespace Vanta.AI
             var distance = Vector3.Distance(transform.position, target.position);
             var suspicion = targetStealth ? targetStealth.Suspicion : (distance <= detectionRange ? 1f : 0f);
             var isHidden = targetStealth && targetStealth.IsHidden;
-            var perceptionResult = perception.Evaluate(
-                distance,
-                detectionRange,
-                suspicion,
-                isHidden,
-                wantedActive);
+            var perceptionResult = perception.Evaluate(distance, detectionRange, suspicion, isHidden, wantedActive);
 
             var tactical = AgentTacticalSystem.Evaluate(new AgentTacticalContext(
                 0.05f,
@@ -76,13 +85,12 @@ namespace Vanta.AI
                 }
                 else
                 {
-                    pursuit.LoseTarget();
-                    stateTimer = searchDuration;
+                    BeginSearch();
                 }
             }
             else if (pursuit.Current == PursuitState.Searching)
             {
-                MoveToward(lastKnownPosition, 0.85f);
+                MoveSearchRoute(0.85f);
                 stateTimer -= Time.deltaTime;
                 if (perceptionResult.Detected && distance <= interceptRange)
                     pursuit.BeginIntercept();
@@ -140,24 +148,18 @@ namespace Vanta.AI
                     stateTimer -= Time.deltaTime;
 
                     if (stateTimer <= 0f)
-                    {
-                        pursuit.BeginCooldown();
-                        stateTimer = cooldownDuration;
-                    }
+                        BeginSearch();
                 }
 
                 return;
             }
 
             if (pursuit.Current == PursuitState.Investigating)
-            {
-                pursuit.LoseTarget();
-                stateTimer = searchDuration;
-            }
+                BeginSearch();
 
             if (pursuit.Current == PursuitState.Searching)
             {
-                MoveToward(lastKnownPosition, 0.55f);
+                MoveSearchRoute(0.55f);
                 stateTimer -= Time.deltaTime;
 
                 if (perceptionResult.Detected)
@@ -180,6 +182,38 @@ namespace Vanta.AI
                 else if (stateTimer <= 0f)
                     pursuit.Reset();
             }
+        }
+
+        private void BeginSearch()
+        {
+            if (!pursuit.LoseTarget())
+                return;
+
+            stateTimer = searchDuration;
+            searchModel?.Reset();
+            currentSearchPoint = null;
+        }
+
+        private void MoveSearchRoute(float speedMultiplier)
+        {
+            if (searchModel == null || investigationPoints == null || investigationPoints.Length == 0)
+            {
+                MoveToward(lastKnownPosition, speedMultiplier);
+                return;
+            }
+
+            if (!currentSearchPoint || Vector3.Distance(transform.position, currentSearchPoint.position) < 1.5f)
+                currentSearchPoint = ResolveSearchPoint(searchModel.NextPoint());
+
+            MoveToward(currentSearchPoint ? currentSearchPoint.position : lastKnownPosition, speedMultiplier);
+        }
+
+        private Transform ResolveSearchPoint(string id)
+        {
+            foreach (var point in investigationPoints)
+                if (point && point.GetInstanceID().ToString() == id)
+                    return point;
+            return null;
         }
 
         private void RefreshTargetStealth()
