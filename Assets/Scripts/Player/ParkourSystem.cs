@@ -1,2 +1,49 @@
 using UnityEngine;
-namespace Vanta.Player{public sealed class ParkourSystem:MonoBehaviour{[SerializeField]float checkDistance=1.2f, vaultHeight=1.4f, vaultSpeed=5f;CharacterController controller;void Awake()=>controller=GetComponent<CharacterController>();void Update(){if(!controller||!Input.GetKeyDown(KeyCode.Space))return;if(Physics.Raycast(transform.position+Vector3.up*.6f,transform.forward,out var hit,checkDistance)&&hit.collider&&hit.point.y-transform.position.y<=vaultHeight)StartCoroutine(Vault());}System.Collections.IEnumerator Vault(){var t=0f;var start=transform.position;var end=start+transform.forward*1.2f+Vector3.up*.5f;while(t<1f){t+=Time.deltaTime*vaultSpeed;controller.Move(Vector3.Lerp(start,end,t)-transform.position);yield return null;}}}}
+
+namespace Vanta.Player
+{
+    public sealed class ParkourSystem : MonoBehaviour
+    {
+        [SerializeField] private float checkDistance = 1.2f;
+        [SerializeField] private float vaultHeight = 1.4f;
+        [SerializeField] private float vaultSpeed = 5f;
+
+        private CharacterController controller;
+        private ParkourTraversalModel model;
+
+        private void Awake()
+        {
+            controller = GetComponent<CharacterController>();
+            model = new ParkourTraversalModel(checkDistance, vaultHeight);
+        }
+
+        private void Update()
+        {
+            if (!controller || !Input.GetKeyDown(KeyCode.Space))
+                return;
+
+            var origin = transform.position + Vector3.up * 0.6f;
+            if (!Physics.Raycast(origin, transform.forward, out var hit, model.CheckDistance) ||
+                !hit.collider)
+                return;
+
+            var obstacleHeight = hit.point.y - transform.position.y;
+            if (model.CanVault(hit.distance, obstacleHeight))
+                StartCoroutine(Vault());
+        }
+
+        private System.Collections.IEnumerator Vault()
+        {
+            var t = 0f;
+            var start = transform.position;
+            var end = start + transform.forward * model.VaultForwardDistance + Vector3.up * 0.5f;
+
+            while (t < 1f)
+            {
+                t += Time.deltaTime * vaultSpeed;
+                controller.Move(Vector3.Lerp(start, end, t) - transform.position);
+                yield return null;
+            }
+        }
+    }
+}
