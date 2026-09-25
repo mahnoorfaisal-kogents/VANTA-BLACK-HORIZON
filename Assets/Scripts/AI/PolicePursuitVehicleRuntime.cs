@@ -29,6 +29,9 @@ namespace Vanta.Vehicles
 
         public void SetTactic(VehiclePursuitTactic tactic, int preferredSlot = 0)
         {
+            if (CurrentTactic == tactic)
+                return;
+
             ReleaseRoadblockSlot();
             CurrentTactic = tactic;
 
