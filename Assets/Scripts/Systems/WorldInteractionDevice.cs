@@ -11,6 +11,8 @@ namespace Vanta.Systems
 
         private WorldInteractionModel model;
         private readonly WorldInteractionConsequenceModel consequenceModel = new();
+        private readonly WorldInteractionCrimeModel crimeModel = new();
+        [SerializeField] private WantedSystem wanted;
 
         public string DeviceId => deviceId;
         public bool IsEnabled => model != null && model.IsEnabled(deviceId);
@@ -40,6 +42,8 @@ namespace Vanta.Systems
             LastDisruption = consequence.Disruption;
             LastPursuitPressure = consequence.PursuitPressure;
             ConsequenceApplied?.Invoke(consequence);
+            if (consequence.PursuitPressure > 0f && wanted)
+                wanted.AddCrime(crimeModel.ResolveCrime(consequence.PursuitPressure));
             return true;
         }
     }
