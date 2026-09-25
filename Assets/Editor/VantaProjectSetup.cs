@@ -124,6 +124,7 @@ namespace Vanta.EditorTools
             var saveCoordinator = world.AddComponent<SaveGameCoordinator>();
             var saveSo = new SerializedObject(saveCoordinator);
             saveSo.FindProperty("saveSystem").objectReferenceValue = saveSystem;
+            var session = world.GetComponent<GameSession>();
             var coordinator = world.AddComponent<GameWorldCoordinator>();
             var coordinatorSo = new SerializedObject(coordinator);
             coordinatorSo.FindProperty("wanted").objectReferenceValue = world.GetComponent<WantedSystem>();
@@ -136,6 +137,7 @@ namespace Vanta.EditorTools
             coordinatorSo.FindProperty("economy").objectReferenceValue = world.GetComponent<EconomySystem>();
             coordinatorSo.FindProperty("progression").objectReferenceValue = world.GetComponent<ProgressionSystem>();
             coordinatorSo.FindProperty("intel").objectReferenceValue = world.GetComponent<IntelMapSystem>();
+            coordinatorSo.FindProperty("worldInteractionDevices").arraySize = 0;
 
             var interactionDevices = CreateWorldInteractionDevices(world.transform);
             var devicesProperty = coordinatorSo.FindProperty("worldInteractionDevices");
@@ -155,6 +157,10 @@ namespace Vanta.EditorTools
             saveSo.FindProperty("missionDefinitions").arraySize = 1;
             saveSo.FindProperty("missionDefinitions").GetArrayElementAtIndex(0).objectReferenceValue = mission;
             saveSo.ApplyModifiedPropertiesWithoutUndo();
+            var sessionSo = new SerializedObject(session);
+            sessionSo.FindProperty("playerHealth").objectReferenceValue = player.GetComponent<Health>();
+            sessionSo.ApplyModifiedPropertiesWithoutUndo();
+
             var camera = CreateCamera(player);
             ConfigureWeapon(player.GetComponent<WeaponController>(), player.transform.Find("Muzzle"), camera.GetComponent<Camera>());
             CreateEnemy(player.transform);
@@ -171,6 +177,7 @@ namespace Vanta.EditorTools
 
             var pause = new GameObject("PauseController");
             var pauseController = pause.AddComponent<VantaPauseController>();
+            pauseController.Configure(session);
             var pauseSo = new SerializedObject(pauseController);
             pauseSo.FindProperty("session").objectReferenceValue = world.GetComponent<GameSession>();
             pauseSo.ApplyModifiedPropertiesWithoutUndo();
