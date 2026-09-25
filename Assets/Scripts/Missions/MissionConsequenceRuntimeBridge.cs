@@ -8,8 +8,14 @@ namespace Vanta.Missions
         [SerializeField] private MissionSystem missions;
         [SerializeField] private EconomySystem economy;
         [SerializeField] private WantedSystem wanted;
+        [SerializeField] private MissionApproach selectedApproach = MissionApproach.Vehicle;
 
         private GameplayConsequenceModel state = new();
+        private readonly MissionApproachModel approachModel = new();
+
+        public MissionApproach SelectedApproach => selectedApproach;
+
+        public void SetApproach(MissionApproach approach) => selectedApproach = approach;
 
         private void OnEnable()
         {
@@ -32,13 +38,26 @@ namespace Vanta.Missions
             if (consequence == null)
                 return;
 
-            state.Apply(consequence);
+            var approach = approachModel.Resolve(selectedApproach);
+            var adjusted = new MissionConsequence
+            {
+                cash = Mathf.Max(0, Mathf.RoundToInt(consequence.cash * approach.RewardMultiplier)),
+                factionId = consequence.factionId,
+                reputationDelta = consequence.reputationDelta + approach.ReputationDelta,
+                territoryId = consequence.territoryId,
+                territoryDelta = consequence.territoryDelta,
+                wantedHeat = Mathf.Max(0f, consequence.wantedHeat + approach.WantedHeat),
+                xp = consequence.xp,
+                revealIds = consequence.revealIds
+            };
 
-            if (economy && consequence.cash != 0)
-                economy.AddCash(consequence.cash);
+            state.Apply(adjusted);
 
-            if (wanted && consequence.wantedHeat > 0f)
-                wanted.AddCrime(consequence.wantedHeat);
+            if (economy && adjusted.cash != 0)
+                economy.AddCash(adjusted.cash);
+
+            if (wanted && adjusted.wantedHeat > 0f)
+                wanted.AddCrime(adjusted.wantedHeat);
         }
     }
 }
