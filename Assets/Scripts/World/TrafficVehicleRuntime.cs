@@ -8,6 +8,8 @@ namespace Vanta.World
         [SerializeField] private TrafficSystem trafficSystem;
         [SerializeField] private string routeId;
         [SerializeField, Min(0f)] private float speed = 9f;
+        [SerializeField] private TrafficPopulationSystem population;
+        [SerializeField] private string populationId;
         [SerializeField, Min(0.1f)] private float waypointRadius = 1.2f;
 
         private readonly TrafficVehicleMovementModel movement = new();
@@ -51,6 +53,18 @@ namespace Vanta.World
             trafficSystem = system;
             routeId = id;
             ResolveRoute();
+        }
+
+        public void ConfigurePopulation(TrafficPopulationSystem system, string id)
+        {
+            population = system;
+            populationId = id;
+        }
+
+        private void OnDestroy()
+        {
+            if (population && !string.IsNullOrWhiteSpace(populationId))
+                population.Despawn(populationId);
         }
 
         private void ResolveRoute()
