@@ -15,7 +15,7 @@ public sealed class MeleeCombatModelTests
     [Test]
     public void InvalidAttackParametersAreBounded()
     {
-        var model = new MeleeCombatModel(-5f, -1f);
+        var model = new MeleeCombatModel(-5f, 0.1f);
         Assert.AreEqual(0f, model.Damage);
         Assert.IsTrue(model.TryAttack(0f));
         Assert.IsFalse(model.TryAttack(0f));
