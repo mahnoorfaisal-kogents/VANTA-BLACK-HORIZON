@@ -19,6 +19,9 @@ namespace Vanta.Vehicles
             var controller = player.GetComponent<PlayerController>();
             if (controller)
                 controller.enabled = false;
+            var characterController = player.GetComponent<CharacterController>();
+            if (characterController)
+                characterController.enabled = false;
 
             player.SetParent(seat ? seat : transform);
             player.localPosition = Vector3.zero;
@@ -34,6 +37,9 @@ namespace Vanta.Vehicles
             player.SetParent(null);
             player.position = transform.position + transform.right * 2f;
 
+            var characterController = player.GetComponent<CharacterController>();
+            if (characterController)
+                characterController.enabled = true;
             var controller = player.GetComponent<PlayerController>();
             if (controller)
                 controller.enabled = true;
