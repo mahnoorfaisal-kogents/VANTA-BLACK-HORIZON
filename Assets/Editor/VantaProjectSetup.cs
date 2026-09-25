@@ -214,6 +214,9 @@ namespace Vanta.EditorTools
                 var go = CreateCube($"Interaction_{id}", parent, position, size, GetMaterial("Building"));
                 var device = go.AddComponent<WorldInteractionDevice>();
                 device.Configure(id, type, true);
+                var deviceSo = new SerializedObject(device);
+                deviceSo.FindProperty("wanted").objectReferenceValue = parent.GetComponentInParent<WantedSystem>();
+                deviceSo.ApplyModifiedPropertiesWithoutUndo();
                 devices[i] = device;
             }
 
