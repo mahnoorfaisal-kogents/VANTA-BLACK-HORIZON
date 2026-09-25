@@ -230,6 +230,7 @@ namespace Vanta.EditorTools
             go.AddComponent<StealthSystem>();
             go.AddComponent<ParkourSystem>();
             go.AddComponent<WorldInteractionInteractor>();
+            go.AddComponent<MeleeCombatSystem>();
 
             var health = go.AddComponent<Health>();
             var weapon = go.AddComponent<WeaponController>();
