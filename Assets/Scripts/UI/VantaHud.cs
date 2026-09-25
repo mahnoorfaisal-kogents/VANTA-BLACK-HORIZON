@@ -29,8 +29,10 @@ namespace Vanta.UI
 
             GUI.Label(new Rect(20, 18, 520, 30), districtName, title);
             var hp = playerHealth ? Mathf.CeilToInt(playerHealth.CurrentHealth) : 0;
-            GUI.Label(new Rect(20, 50, 360, 24), $"HP {hp}   |   WASD Move   SHIFT Sprint   CTRL Crouch", body);
-            GUI.Label(new Rect(20, 74, 520, 24), "SPACE Jump   RMB Aim   LMB Fire   R Reload   ESC Pause", body);
+            GUI.Label(new Rect(20, 50, 620, 24), $"HP {hp}   |   AMMO {(weapon ? weapon.AmmoInMagazine : 0)}   |   WANTED {(wanted ? wanted.Level : 0)}", body);
+            GUI.Label(new Rect(20, 74, 620, 24), "WASD Move   SHIFT Sprint   CTRL Crouch   SPACE Jump   RMB Aim   LMB Fire   R Reload   F Melee   E Interact   ESC Pause", body);
+            if (interaction && interaction.CurrentDevice)
+                GUI.Label(new Rect(20, 98, 520, 24), $"INTERACT // {interaction.CurrentDevice.DeviceType} [{interaction.CurrentDevice.DeviceId}]", body);
             GUI.Label(new Rect(Screen.width - 250, 18, 230, 24), "VANTA // LIVE DISTRICT", body);
         }
     }
