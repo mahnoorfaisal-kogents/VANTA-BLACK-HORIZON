@@ -68,3 +68,37 @@ public sealed class VehiclePursuitMovementModelTests
         Assert.AreEqual(Vector3.one, model.NextPosition(Vector3.one, Vector3.zero, 10f, 1f, 1f));
     }
 }
+
+
+public sealed class PolicePursuitVehicleRuntimeTests
+{
+    [Test]
+    public void ChangingTargetReplansExistingRoadblockTactic()
+    {
+        var policeObject = new UnityEngine.GameObject("PolicePursuitVehicleTest");
+        policeObject.AddComponent<UnityEngine.Rigidbody>();
+        var runtime = policeObject.AddComponent<Vanta.Vehicles.PolicePursuitVehicleRuntime>();
+
+        var firstTargetObject = new UnityEngine.GameObject("TargetA");
+        firstTargetObject.transform.position = new UnityEngine.Vector3(0f, 0f, 10f);
+        firstTargetObject.transform.forward = UnityEngine.Vector3.forward;
+
+        var secondTargetObject = new UnityEngine.GameObject("TargetB");
+        secondTargetObject.transform.position = new UnityEngine.Vector3(20f, 0f, 10f);
+        secondTargetObject.transform.forward = UnityEngine.Vector3.right;
+
+        runtime.SetTarget(firstTargetObject.transform);
+        runtime.SetTactic(Vanta.Vehicles.VehiclePursuitTactic.Roadblock);
+        var firstPlan = runtime.CurrentRoadblock;
+
+        runtime.SetTarget(secondTargetObject.transform);
+        var secondPlan = runtime.CurrentRoadblock;
+
+        Assert.AreNotEqual(firstPlan.Position, secondPlan.Position);
+        Assert.AreEqual(new UnityEngine.Vector3(32f, 0f, 10f), secondPlan.Position);
+
+        UnityEngine.Object.DestroyImmediate(firstTargetObject);
+        UnityEngine.Object.DestroyImmediate(secondTargetObject);
+        UnityEngine.Object.DestroyImmediate(policeObject);
+    }
+}
