@@ -134,6 +134,12 @@ namespace Vanta.EditorTools
             coordinatorSo.FindProperty("economy").objectReferenceValue = world.GetComponent<EconomySystem>();
             coordinatorSo.FindProperty("progression").objectReferenceValue = world.GetComponent<ProgressionSystem>();
             coordinatorSo.FindProperty("intel").objectReferenceValue = world.GetComponent<IntelMapSystem>();
+
+            var interactionDevices = CreateWorldInteractionDevices(world.transform);
+            var devicesProperty = coordinatorSo.FindProperty("worldInteractionDevices");
+            devicesProperty.arraySize = interactionDevices.Length;
+            for (var i = 0; i < interactionDevices.Length; i++)
+                devicesProperty.GetArrayElementAtIndex(i).objectReferenceValue = interactionDevices[i];
             coordinatorSo.ApplyModifiedPropertiesWithoutUndo();
             world.AddComponent<GameSession>();
 
@@ -179,6 +185,33 @@ namespace Vanta.EditorTools
             return scene;
         }
 
+        private static WorldInteractionDevice[] CreateWorldInteractionDevices(Transform parent)
+        {
+            var definitions = new[]
+            {
+                ("traffic_01", WorldInteractionDeviceType.TrafficLight, new Vector3(8f, 1f, 18f)),
+                ("camera_01", WorldInteractionDeviceType.Camera, new Vector3(18f, 4f, 18f)),
+                ("gate_01", WorldInteractionDeviceType.SecurityGate, new Vector3(28f, 1f, 8f)),
+                ("alarm_01", WorldInteractionDeviceType.Alarm, new Vector3(-10f, 2f, 20f)),
+                ("bridge_01", WorldInteractionDeviceType.Bridge, new Vector3(-24f, 1f, -8f))
+            };
+
+            var devices = new WorldInteractionDevice[definitions.Length];
+            for (var i = 0; i < definitions.Length; i++)
+            {
+                var (id, type, position) = definitions[i];
+                var size = type == WorldInteractionDeviceType.Camera
+                    ? new Vector3(0.7f, 1.5f, 0.7f)
+                    : new Vector3(1.2f, 1.2f, 1.2f);
+                var go = CreateCube($"Interaction_{id}", parent, position, size, GetMaterial("Building"));
+                var device = go.AddComponent<WorldInteractionDevice>();
+                device.Configure(id, type, true);
+                devices[i] = device;
+            }
+
+            return devices;
+        }
+
         private static GameObject CreatePlayer()
         {
             var go = GameObject.CreatePrimitive(PrimitiveType.Capsule);
@@ -196,6 +229,7 @@ namespace Vanta.EditorTools
             go.AddComponent<PlayerController>();
             go.AddComponent<StealthSystem>();
             go.AddComponent<ParkourSystem>();
+            go.AddComponent<WorldInteractionInteractor>();
 
             var health = go.AddComponent<Health>();
             var weapon = go.AddComponent<WeaponController>();
