@@ -85,6 +85,7 @@ namespace Vanta.EditorTools
             world.AddComponent<WeatherSystem>();
             world.AddComponent<WorldEventDirector>();
             world.AddComponent<WorldEventSystem>();
+            world.AddComponent<BulletTimeSystem>();
             world.AddComponent<DistrictRuntimeSystem>();
             world.AddComponent<DistrictStreamingSystem>();
             world.AddComponent<PerformanceBudgetSystem>();
