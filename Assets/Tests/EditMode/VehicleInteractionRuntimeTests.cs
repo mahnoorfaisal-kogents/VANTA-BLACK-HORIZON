@@ -16,15 +16,19 @@ public sealed class VehicleInteractionRuntimeTests
         var player = new GameObject("Player");
         player.AddComponent<CharacterController>();
         var controller = player.AddComponent<PlayerController>();
+        var characterController = player.GetComponent<CharacterController>();
 
         Assert.IsTrue(controller.enabled);
+        Assert.IsTrue(characterController.enabled);
         Assert.IsTrue(interaction.TryEnter(player.transform));
         Assert.IsTrue(interaction.IsOccupied);
         Assert.IsFalse(controller.enabled);
+        Assert.IsFalse(characterController.enabled);
 
         interaction.Exit(player.transform);
         Assert.IsFalse(interaction.IsOccupied);
         Assert.IsTrue(controller.enabled);
+        Assert.IsTrue(characterController.enabled);
 
         Object.DestroyImmediate(player);
         Object.DestroyImmediate(vehicle);
