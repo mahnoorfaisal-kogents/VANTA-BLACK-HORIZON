@@ -137,3 +137,69 @@ Expand districts, interiors, content, cinematics and optimization.
 ## IP boundary
 
 These reference games are used only for publicly documented gameplay-system research. VANTA must not reproduce their protected characters, dialogue, missions, maps, logos, music, artwork, models, or storylines.
+
+
+## Reference Research Wave 03 — requested game families
+
+### Grand Theft Auto
+GTA V's documented design centers on a large connected city/countryside/coast setting, mission-based progression, vehicles, activities and multiple approaches to open-world play. VANTA should borrow the systemic principle — travel, crime, economy, missions and encounters interacting — while keeping its city, characters and story original.
+
+### Call of Duty
+Modern COD material demonstrates tightly authored campaign spaces, multiple mission types, tactical movement, weapon/loadout progression, squad play and replayable combat systems. VANTA should use these lessons for mission set pieces, evidence/intel planning, loadout preparation and tactical squad behavior rather than copying campaign scenes or characters.
+
+### Assassin's Creed
+Ubisoft describes the franchise as open-world action-adventure with stealth and RPG elements, while Shadows adds strong exploration, parkour, light/noise/shadow stealth and environmental discovery. VANTA should expand traversal routes, information gathering, stealth perception and vertical districts.
+
+### IGI
+The name "IGI 3" is not a reliable current official title reference. For research, VANTA should treat the Project I.G.I. lineage and the officially announced *IGI Origins* as the relevant stealth/tactical reference. The useful design pattern is mission reconnaissance, controlled weapon use, infiltration, alarms and extraction — not reproducing a protected level or story.
+
+### Need for Speed
+EA documents deep visual/performance vehicle customization, tuning, risk/reward driving and police pursuit loops. VANTA should connect garage progression, vehicle handling, illegal races, heat and pursuit consequences.
+
+### Asphalt
+Asphalt 9 is explicitly arcade racing with accessible controls, large car rosters, progression, multiplayer and time-limited activities. VANTA can use an arcade event layer for optional street challenges while keeping its main vehicle physics coherent with the open-world simulation.
+
+### GRID Autosport
+GRID Autosport combines believable handling with multiple disciplines, career progression, vehicle tuning/upgrades and damage that can affect handling. VANTA should add distinct race archetypes, tuning trade-offs and mechanical damage consequences rather than one generic race activity.
+
+### Max Payne
+Rockstar documents precision shooting, Bullet Time, Shootdodge, individually modeled bullets and reactive injury presentation. VANTA now has a deterministic Bullet Time foundation that can later be connected to camera, input and combat presentation without copying Max Payne's story or presentation.
+
+### Far Cry
+Ubisoft describes open-world FPS play with multiple approaches such as stealth, close combat and sniping, plus diverse environments and systemic encounters. VANTA should use this as a reference for approach freedom, outposts/events, environmental variety and tactical combat.
+
+### Tom Clancy
+Splinter Cell is an explicit stealth-shooter reference, while the broader Tom Clancy family supplies tactical squad, reconnaissance and stealth patterns. VANTA should continue improving perception, squad roles, search behavior, cover and mission planning.
+
+### Mafia
+Mafia: Definitive Edition is a story-led crime saga set in a recreated 1930s city. Its useful lesson is authored cinematic mission pacing, period-specific world identity and character-driven progression. VANTA should use original factions, characters and districts.
+
+### Sleeping Dogs
+Sleeping Dogs combines an undercover-cop story with martial arts, gunfights, takedowns, driving, boats, illegal races and a dense Hong Kong setting. VANTA should expand close-quarters combat, vehicle activities and faction-cover consequences as original systems.
+
+### Watch Dogs
+Ubisoft describes a living city where connected infrastructure, vehicles and public systems can become gameplay tools. VANTA's new WorldInteractionModel is the first foundation for safe, game-owned infrastructure interactions; it deliberately does not execute arbitrary operating-system commands.
+
+### Just Cause
+Just Cause 3 documents vertical freedom through grappling, parachute and wingsuit traversal, vehicle variety and large-scale destructible chaos. VANTA now has a deterministic GrappleTraversalModel foundation; future integration should focus on traversal and controlled world-object interactions with performance-safe constraints.
+
+## Graphics, physics and map lessons
+
+Across these references, three patterns are particularly useful for VANTA:
+
+1. **Layered maps:** a district should combine roads, alleys, interiors, rooftops, landmarks, traversal routes and mission/activity spaces rather than only a flat terrain grid.
+2. **Physics with gameplay consequences:** vehicle damage should affect handling; traversal distance should be constrained; world interactions should change simulation state; combat should produce readable reactions.
+3. **Presentation follows systems:** weather/time/lighting should affect visibility; police/world events should alter ambient activity; race and mission states should drive HUD/camera/audio feedback.
+
+These are design references only. VANTA must use original characters, story, dialogue, maps, missions, logos, music, models, textures and other assets.
+
+## Wave 03 implementation
+
+The first implementation slice derived from this research adds deterministic foundations for:
+- connected-world infrastructure interaction;
+- Bullet Time as a reusable combat presentation state;
+- bounded grapple traversal;
+- ordered multi-lap racing events;
+- Windows installer packaging through Inno Setup after a verified Unity Windows build.
+
+Runtime wiring remains subject to Unity compile/Test Runner/Play Mode verification.
