@@ -161,6 +161,7 @@ namespace Vanta.EditorTools
             CreatePolice(player.transform, world.GetComponent<WantedSystem>());
             CreatePolicePursuitVehicle(world.transform, player.transform, pursuitCoordinator, trafficSlots);
             CreateDiscoveryPoints();
+            CreateGrappleAnchors(world.transform);
             CreateCivilians();
             CreateVehicles();
             CreateTrafficRuntime(world.transform, trafficSystem, world.GetComponent<TrafficPopulationSystem>());
@@ -236,6 +237,7 @@ namespace Vanta.EditorTools
             go.AddComponent<PlayerController>();
             go.AddComponent<StealthSystem>();
             go.AddComponent<ParkourSystem>();
+            go.AddComponent<GrappleTraversalSystem>();
             go.AddComponent<WorldInteractionInteractor>();
             go.AddComponent<MeleeCombatSystem>();
 
@@ -388,6 +390,27 @@ namespace Vanta.EditorTools
                 triggerSo.FindProperty("objectiveId").stringValue = mission.objectiveGraph[i].id;
                 triggerSo.FindProperty("consumeOnComplete").boolValue = true;
                 triggerSo.ApplyModifiedPropertiesWithoutUndo();
+            }
+        }
+
+        private static void CreateGrappleAnchors(Transform parent)
+        {
+            var points = new[]
+            {
+                new Vector3(24f, 8f, 24f),
+                new Vector3(-24f, 10f, 24f),
+                new Vector3(24f, 12f, -24f),
+                new Vector3(-24f, 9f, -24f)
+            };
+
+            for (var i = 0; i < points.Length; i++)
+            {
+                var anchorObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                anchorObject.name = $"GrappleAnchor_{i:00}";
+                anchorObject.transform.SetParent(parent);
+                anchorObject.transform.position = points[i];
+                anchorObject.transform.localScale = Vector3.one * 0.35f;
+                anchorObject.AddComponent<GrappleAnchor>().name = $"GrappleAnchor_{i:00}";
             }
         }
 
