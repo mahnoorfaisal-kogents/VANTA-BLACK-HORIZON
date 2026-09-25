@@ -56,10 +56,11 @@ namespace Vanta.Player
             if (!Physics.Raycast(origin, direction, out var hit, maxDistance, anchorMask, QueryTriggerInteraction.Ignore))
                 return;
 
-            if (!hit.collider || !hit.collider.CompareTag("GrappleAnchor"))
+            var anchor = hit.collider ? hit.collider.GetComponentInParent<GrappleAnchor>() : null;
+            if (!anchor)
                 return;
 
-            if (!model.TryAttach(hit.distance, hit.collider.GetInstanceID().ToString()))
+            if (!model.TryAttach(hit.distance, anchor.AnchorId))
                 return;
 
             anchor = hit.collider.transform;
