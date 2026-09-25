@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Vanta.Systems
@@ -9,9 +10,13 @@ namespace Vanta.Systems
         [SerializeField] private bool enabledState = true;
 
         private WorldInteractionModel model;
+        private readonly WorldInteractionConsequenceModel consequenceModel = new();
 
         public string DeviceId => deviceId;
         public bool IsEnabled => model != null && model.IsEnabled(deviceId);
+        public float LastDisruption { get; private set; }
+        public float LastPursuitPressure { get; private set; }
+        public event Action<WorldInteractionConsequence> ConsequenceApplied;
 
         public void Initialize(WorldInteractionModel sharedModel)
         {
@@ -28,7 +33,14 @@ namespace Vanta.Systems
                 return false;
 
             var action = value ? WorldInteractionAction.Enable : WorldInteractionAction.Disable;
-            return model.TryApply(deviceId, action);
+            if (!model.TryApply(deviceId, action))
+                return false;
+
+            var consequence = consequenceModel.Resolve(deviceType, action);
+            LastDisruption = consequence.Disruption;
+            LastPursuitPressure = consequence.PursuitPressure;
+            ConsequenceApplied?.Invoke(consequence);
+            return true;
         }
     }
 }
