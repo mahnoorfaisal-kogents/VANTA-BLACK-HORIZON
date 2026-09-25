@@ -15,10 +15,18 @@ namespace Vanta.Systems
         [SerializeField] private WantedSystem wanted;
 
         public string DeviceId => deviceId;
+        public WorldInteractionDeviceType DeviceType => deviceType;
         public bool IsEnabled => model != null && model.IsEnabled(deviceId);
         public float LastDisruption { get; private set; }
         public float LastPursuitPressure { get; private set; }
         public event Action<WorldInteractionConsequence> ConsequenceApplied;
+
+        public void Configure(string id, WorldInteractionDeviceType type, bool enabled = true)
+        {
+            deviceId = id;
+            deviceType = type;
+            enabledState = enabled;
+        }
 
         public void Initialize(WorldInteractionModel sharedModel)
         {
@@ -27,6 +35,11 @@ namespace Vanta.Systems
                 return;
 
             model.Register(deviceId, deviceType, enabledState);
+        }
+
+        public bool Interact()
+        {
+            return SetEnabled(!IsEnabled);
         }
 
         public bool SetEnabled(bool value)
