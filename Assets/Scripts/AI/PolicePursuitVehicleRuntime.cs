@@ -71,7 +71,7 @@ namespace Vanta.Vehicles
             var healthPercent = 1f;
             var vehicle = GetComponent<VehicleController>();
             if (vehicle)
-                healthPercent = vehicle.Health / Mathf.Max(1f, vehicle.MaxHealth) * 100f;
+                healthPercent = vehicle.Health / Mathf.Max(1f, vehicle.MaxHealth);
 
             var currentPosition = body.position;
             var next = movement.NextPosition(
