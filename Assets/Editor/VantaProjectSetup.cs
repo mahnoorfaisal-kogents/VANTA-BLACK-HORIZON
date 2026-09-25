@@ -167,7 +167,7 @@ namespace Vanta.EditorTools
             CreatePolicePursuitVehicle(world.transform, player.transform, pursuitCoordinator, trafficSlots);
             CreateDiscoveryPoints();
             CreateGrappleAnchors(world.transform);
-            CreateCivilians();
+            CreateCivilians(player.transform);
             CreateVehicles();
             CreateTrafficRuntime(world.transform, trafficSystem, world.GetComponent<TrafficPopulationSystem>());
             navSurface.BuildNavMesh();
@@ -450,7 +450,7 @@ namespace Vanta.EditorTools
             }
         }
 
-        private static void CreateCivilians()
+        private static void CreateCivilians(Transform player)
         {
             for (var i = 0; i < DistrictLayout.CivilianCount; i++)
             {
@@ -458,7 +458,8 @@ namespace Vanta.EditorTools
                 go.name = $"Civilian_{i:00}";
                 go.transform.position = new Vector3(-22f + i * 8f, 1f, -2f);
                 go.transform.localScale = new Vector3(0.65f, 0.9f, 0.65f);
-                go.AddComponent<CivilianAI>();
+                var civilian = go.AddComponent<CivilianAI>();
+                civilian.SetThreat(player);
                 go.AddComponent<VantaAgentBrain>();
             }
         }
