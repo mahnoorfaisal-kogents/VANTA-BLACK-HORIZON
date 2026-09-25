@@ -12,6 +12,8 @@ namespace Vanta.UI
         {
             if (Input.GetKeyDown(KeyCode.Escape))
                 HandlePauseInput(KeyCode.Escape);
+            if (Input.GetKeyDown(KeyCode.Return))
+                HandleRestartInput(KeyCode.Return);
         }
 
         public void Configure(GameSession gameSession) => session = gameSession;
@@ -21,6 +23,13 @@ namespace Vanta.UI
             if (key != KeyCode.Escape || !session) return false;
             TogglePause();
             return true;
+        }
+
+        public bool HandleRestartInput(KeyCode key)
+        {
+            if (key != KeyCode.Return || !session || session.State != GameplayState.Dead)
+                return false;
+            return session.RestartPlayer();
         }
 
         public void TogglePause()
