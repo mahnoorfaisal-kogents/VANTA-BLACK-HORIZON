@@ -156,9 +156,7 @@ namespace Vanta.EditorTools
             saveSo.FindProperty("missionDefinitions").arraySize = 1;
             saveSo.FindProperty("missionDefinitions").GetArrayElementAtIndex(0).objectReferenceValue = mission;
             saveSo.ApplyModifiedPropertiesWithoutUndo();
-            var sessionSo = new SerializedObject(session);
-            sessionSo.FindProperty("playerHealth").objectReferenceValue = player.GetComponent<Health>();
-            sessionSo.ApplyModifiedPropertiesWithoutUndo();
+            session.Configure(player.GetComponent<Health>());
 
             var camera = CreateCamera(player);
             ConfigureWeapon(player.GetComponent<WeaponController>(), player.transform.Find("Muzzle"), camera.GetComponent<Camera>());
