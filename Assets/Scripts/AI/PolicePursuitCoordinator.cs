@@ -27,7 +27,7 @@ namespace Vanta.AI
                 return;
             }
 
-            bool targetInVehicle = target && target.GetComponent<VehicleController>() != null;
+            bool targetInVehicle = IsTargetInVehicle(target);
             VehicleTactic = vehicleTactics.Resolve(wantedLevel, targetInVehicle);
             if (pursuitVehicle)
             {
@@ -37,6 +37,11 @@ namespace Vanta.AI
 
             if (pursuit.Current == PursuitState.Dormant || pursuit.Current == PursuitState.Cooldown)
                 pursuit.BeginIntercept();
+        }
+
+        public static bool IsTargetInVehicle(Transform candidate)
+        {
+            return candidate && candidate.GetComponentInParent<VehicleController>() != null;
         }
 
         public void SetTarget(Transform newTarget)
