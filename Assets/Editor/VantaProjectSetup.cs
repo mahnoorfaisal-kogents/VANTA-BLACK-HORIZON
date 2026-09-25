@@ -174,6 +174,10 @@ namespace Vanta.EditorTools
 
             CreateMissionRuntime(world.transform, mission);
 
+            var saveInput = new GameObject("SaveInput");
+            var saveController = saveInput.AddComponent<VantaSaveController>();
+            saveController.Configure(saveCoordinator, "slot_01");
+
             var pause = new GameObject("PauseController");
             var pauseController = pause.AddComponent<VantaPauseController>();
             pauseController.Configure(session);
