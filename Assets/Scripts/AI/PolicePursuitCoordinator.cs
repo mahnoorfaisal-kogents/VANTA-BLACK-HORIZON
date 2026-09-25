@@ -9,6 +9,7 @@ namespace Vanta.AI
         readonly VehiclePursuitTacticsModel vehicleTactics = new();
 
         [SerializeField] private Transform target;
+        [SerializeField] private PolicePursuitVehicleRuntime pursuitVehicle;
         public PoliceEscalationLevel Escalation { get; private set; } = PoliceEscalationLevel.Patrol;
         public PursuitState PursuitState => pursuit.Current;
         public VehiclePursuitTactic VehicleTactic { get; private set; } = VehiclePursuitTactic.Pursue;
@@ -20,18 +21,29 @@ namespace Vanta.AI
             if (wantedLevel <= 0)
             {
                 VehicleTactic = VehiclePursuitTactic.Pursue;
+                pursuitVehicle?.SetTarget(target);
+                pursuitVehicle?.SetTactic(VehicleTactic);
                 pursuit.Reset();
                 return;
             }
 
             bool targetInVehicle = target && target.GetComponent<VehicleController>() != null;
             VehicleTactic = vehicleTactics.Resolve(wantedLevel, targetInVehicle);
+            if (pursuitVehicle)
+            {
+                pursuitVehicle.SetTarget(target);
+                pursuitVehicle.SetTactic(VehicleTactic);
+            }
 
             if (pursuit.Current == PursuitState.Dormant || pursuit.Current == PursuitState.Cooldown)
                 pursuit.BeginIntercept();
         }
 
-        public void SetTarget(Transform newTarget) => target = newTarget;
+        public void SetTarget(Transform newTarget)
+        {
+            target = newTarget;
+            pursuitVehicle?.SetTarget(newTarget);
+        }
 
         public static PoliceEscalationLevel ResolveEscalation(int wantedLevel)
         {

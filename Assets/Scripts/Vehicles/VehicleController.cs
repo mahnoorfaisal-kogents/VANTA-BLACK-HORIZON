@@ -28,6 +28,7 @@ namespace Vanta.Vehicles
         float lastRepairTime = float.NegativeInfinity;
 
         public float Health => damageState?.Health ?? 0f;
+        public float MaxHealth => maxHealth;
         public bool IsDestroyed => damageState?.IsDestroyed ?? true;
         public event Action Destroyed;
 
