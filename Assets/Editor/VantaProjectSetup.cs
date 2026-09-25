@@ -124,7 +124,7 @@ namespace Vanta.EditorTools
             var saveCoordinator = world.AddComponent<SaveGameCoordinator>();
             var saveSo = new SerializedObject(saveCoordinator);
             saveSo.FindProperty("saveSystem").objectReferenceValue = saveSystem;
-            var session = world.GetComponent<GameSession>();
+            var session = world.AddComponent<GameSession>();
             var coordinator = world.AddComponent<GameWorldCoordinator>();
             var coordinatorSo = new SerializedObject(coordinator);
             coordinatorSo.FindProperty("wanted").objectReferenceValue = world.GetComponent<WantedSystem>();
@@ -137,7 +137,6 @@ namespace Vanta.EditorTools
             coordinatorSo.FindProperty("economy").objectReferenceValue = world.GetComponent<EconomySystem>();
             coordinatorSo.FindProperty("progression").objectReferenceValue = world.GetComponent<ProgressionSystem>();
             coordinatorSo.FindProperty("intel").objectReferenceValue = world.GetComponent<IntelMapSystem>();
-            coordinatorSo.FindProperty("worldInteractionDevices").arraySize = 0;
 
             var interactionDevices = CreateWorldInteractionDevices(world.transform);
             var devicesProperty = coordinatorSo.FindProperty("worldInteractionDevices");
