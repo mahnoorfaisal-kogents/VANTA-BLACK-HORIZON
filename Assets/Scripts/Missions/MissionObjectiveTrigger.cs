@@ -29,12 +29,28 @@ namespace Vanta.Missions
         [SerializeField] MissionSystem missionSystem;
         [SerializeField] string missionId;
         [SerializeField] string[] objectiveIds;
+        public void Configure(MissionSystem system, string id, string[] ids)
+        {
+            missionSystem = system;
+            missionId = id;
+            objectiveIds = ids;
+        }
+
         public void TryActivateNext(string completedId)
         {
-            if (!missionSystem || objectiveIds == null) return;
+            if (!missionSystem || objectiveIds == null || objectiveIds.Length == 0) return;
+
             for (var i = 0; i < objectiveIds.Length - 1; i++)
+            {
                 if (objectiveIds[i] == completedId)
+                {
                     missionSystem.SetObjectiveActive(missionId, objectiveIds[i + 1]);
+                    return;
+                }
+            }
+
+            if (objectiveIds[objectiveIds.Length - 1] == completedId)
+                missionSystem.CompleteMission(missionId);
         }
     }
 }
