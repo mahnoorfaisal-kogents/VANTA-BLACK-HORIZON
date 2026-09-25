@@ -1,5 +1,8 @@
 using UnityEngine;
 using Vanta.Core;
+using Vanta.Combat;
+using Vanta.Systems;
+using Vanta.Player;
 
 namespace Vanta.UI
 {
@@ -7,6 +10,9 @@ namespace Vanta.UI
     {
         [SerializeField] private Health playerHealth;
         [SerializeField] private string districtName = "BLACK HORIZON // SECTOR 01";
+        [SerializeField] private WeaponController weapon;
+        [SerializeField] private WantedSystem wanted;
+        [SerializeField] private WorldInteractionInteractor interaction;
 
         private GUIStyle title;
         private GUIStyle body;
