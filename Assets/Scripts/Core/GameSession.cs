@@ -17,8 +17,19 @@ namespace Vanta.Core
             if (Instance && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
             stateService.Changed += OnStateChanged;
+            if (playerHealth) playerHealth.Died += HandlePlayerDied;
             DontDestroyOnLoad(gameObject);
         }
+
+        public void Configure(Health health)
+        {
+            if (playerHealth == health) return;
+            if (playerHealth) playerHealth.Died -= HandlePlayerDied;
+            playerHealth = health;
+            if (playerHealth) playerHealth.Died += HandlePlayerDied;
+        }
+
+        private void HandlePlayerDied() => MarkDead();
 
         private void Start()
         {
@@ -62,6 +73,7 @@ namespace Vanta.Core
         private void OnDestroy()
         {
             stateService.Changed -= OnStateChanged;
+            if (playerHealth) playerHealth.Died -= HandlePlayerDied;
             if (Instance == this) { Time.timeScale = 1f; Instance = null; }
         }
     }
