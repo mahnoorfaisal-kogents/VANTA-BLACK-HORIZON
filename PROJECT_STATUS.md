@@ -139,3 +139,13 @@ No runtime-complete or build-complete claim should be made until Unity actually 
 - Automated Windows build was actually triggered for commit fb0de6a1852b83f3de224006d8f098bba848e92c and reached the Unity builder.
 - Build result: BLOCKED before Unity project compilation because the repository has no configured Unity license secret/serial. The workflow log reports: Missing Unity License File and no Serial was found.
 - Therefore no .exe artifact was produced by this run. Unity compile, EditMode, Play Mode, NavMesh runtime, and Windows executable remain UNVERIFIED until a licensed Unity activation is supplied to GitHub Actions or the project is opened/built in a local Unity Editor.
+
+## Gameplay Expansion Wave 03 — research-driven implementation
+- Researched the requested reference families: GTA, Call of Duty, Assassin's Creed, Project I.G.I./IGI Origins, Need for Speed, Asphalt, GRID Autosport, Max Payne, Far Cry, Tom Clancy, Mafia, Sleeping Dogs, Watch Dogs and Just Cause.
+- Added WorldInteractionModel for deterministic, game-owned infrastructure state changes.
+- Added BulletTimeModel for bounded slow-motion combat presentation state with duration/cooldown.
+- Added GrappleTraversalModel with explicit distance and anchor validation.
+- Added RacingEventModel for ordered checkpoints and multi-lap progression.
+- Added EditMode regression coverage for the new deterministic models.
+- Added Installer/VANTA_Black_Horizon.iss and Installer/Build-Installer.ps1. Once Builds/Windows/VANTA_BLACK_HORIZON.exe is produced by a verified Unity build, the installer creates VANTA_BLACK_HORIZON_Setup.exe and prompts for the installation destination before copying the complete Windows build.
+- These are source-level implementations. Unity compilation, Test Runner execution, Play Mode, physics, NavMesh and final installer execution are still unverified until a real Unity Editor/build environment is available.
