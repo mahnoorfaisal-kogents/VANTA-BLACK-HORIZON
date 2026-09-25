@@ -21,6 +21,8 @@ namespace Vanta.AI
             if (wantedLevel <= 0)
             {
                 VehicleTactic = VehiclePursuitTactic.Pursue;
+                pursuitVehicle?.SetTarget(target);
+                pursuitVehicle?.SetTactic(VehicleTactic);
                 pursuit.Reset();
                 return;
             }
