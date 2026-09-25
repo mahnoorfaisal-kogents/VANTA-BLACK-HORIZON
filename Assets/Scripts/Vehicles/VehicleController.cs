@@ -1,10 +1,11 @@
 using System;
 using UnityEngine;
+using Vanta.Core;
 
 namespace Vanta.Vehicles
 {
     [RequireComponent(typeof(Rigidbody))]
-    public sealed class VehicleController : MonoBehaviour
+    public sealed class VehicleController : MonoBehaviour, IDamageable
     {
         [SerializeField] float acceleration = 12f;
         [SerializeField] float turnRate = 70f;
@@ -30,6 +31,7 @@ namespace Vanta.Vehicles
         public float Health => damageState?.Health ?? 0f;
         public float MaxHealth => maxHealth;
         public bool IsDestroyed => damageState?.IsDestroyed ?? true;
+        public bool IsAlive => !IsDestroyed;
         public event Action Destroyed;
 
         void Awake()
@@ -85,6 +87,8 @@ namespace Vanta.Vehicles
         }
 
         public void ApplyDamage(float amount) => damageState?.ApplyDamage(amount);
+
+        public void ApplyDamage(float amount, Vector3 hitPoint, GameObject source) => ApplyDamage(amount);
 
         public bool TryRecover(float now)
         {
