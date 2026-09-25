@@ -10,9 +10,12 @@ namespace Vanta.Vehicles
         [SerializeField] float turnRate = 70f;
         [SerializeField] float maxSpeed = 28f;
         [SerializeField] float maxHealth = 100f;
+        [SerializeField] float baseGrip = 1f;
+        [SerializeField, Range(0f, 1f)] float minimumGrip = 0.35f;
 
         Rigidbody body;
         VehicleDamageState damageState;
+        VehicleHandlingModel handlingModel;
 
         public float Health => damageState?.Health ?? 0f;
         public bool IsDestroyed => damageState?.IsDestroyed ?? true;
@@ -22,6 +25,7 @@ namespace Vanta.Vehicles
         {
             body = GetComponent<Rigidbody>();
             damageState = new VehicleDamageState(maxHealth);
+            handlingModel = new VehicleHandlingModel(maxSpeed, baseGrip, minimumGrip);
             damageState.Destroyed += HandleDestroyed;
         }
 
@@ -36,14 +40,17 @@ namespace Vanta.Vehicles
 
             float throttle = Input.GetAxis("Vertical");
             float steer = Input.GetAxis("Horizontal");
+            var healthPercent = maxHealth <= 0f ? 0f : Health / maxHealth * 100f;
+            var effectiveSpeed = handlingModel.EffectiveMaxSpeed(healthPercent);
+            var effectiveGrip = handlingModel.EffectiveGrip(healthPercent);
             body.AddForce(transform.forward * throttle * acceleration, ForceMode.Acceleration);
             body.MoveRotation(body.rotation * Quaternion.Euler(
                 0,
-                steer * turnRate * Time.fixedDeltaTime * Mathf.Clamp01(body.velocity.magnitude / 5f),
+                steer * turnRate * effectiveGrip * Time.fixedDeltaTime * Mathf.Clamp01(body.velocity.magnitude / 5f),
                 0));
 
-            if (body.velocity.magnitude > maxSpeed)
-                body.velocity = body.velocity.normalized * maxSpeed;
+            if (body.velocity.magnitude > effectiveSpeed)
+                body.velocity = body.velocity.normalized * effectiveSpeed;
         }
 
         public void ApplyDamage(float amount)
