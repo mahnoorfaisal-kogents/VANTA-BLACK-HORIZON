@@ -11,10 +11,7 @@ public sealed class WorldInteractionDeviceRuntimeTests
         var device = go.AddComponent<WorldInteractionDevice>();
 
         var model = new WorldInteractionModel();
-        var init = typeof(WorldInteractionDevice).GetMethod("Initialize");
-        Assert.IsNotNull(init);
-
-        device.SetTestConfiguration("traffic_test", WorldInteractionDeviceType.TrafficLight, true);
+        device.Configure("traffic_test", WorldInteractionDeviceType.TrafficLight, true);
         device.Initialize(model);
 
         WorldInteractionConsequence? emitted = null;
