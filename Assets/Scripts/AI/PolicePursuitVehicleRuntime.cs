@@ -68,17 +68,18 @@ namespace Vanta.Vehicles
             var healthPercent = 1f;
             var vehicle = GetComponent<VehicleController>();
             if (vehicle)
-                healthPercent = vehicle.CurrentHealth / Mathf.Max(1f, vehicle.MaxHealth) * 100f;
+                healthPercent = vehicle.Health / Mathf.Max(1f, 100f) * 100f;
 
+            var currentPosition = body.position;
             var next = movement.NextPosition(
-                body.position,
+                currentPosition,
                 direction,
                 pursuitSpeed,
                 healthPercent,
                 Time.fixedDeltaTime);
 
             body.MovePosition(next);
-            var flat = next - body.position;
+            var flat = next - currentPosition;
             flat.y = 0f;
             if (flat.sqrMagnitude > 0.0001f)
                 body.MoveRotation(Quaternion.LookRotation(flat.normalized, Vector3.up));
