@@ -99,7 +99,7 @@ namespace Vanta.EditorTools
             world.AddComponent<ScoutingSystem>();
             world.AddComponent<IntelMapSystem>();
             world.AddComponent<PersistentWorldState>();
-            world.AddComponent<TrafficSystem>();
+            var trafficSystem = world.AddComponent<TrafficSystem>();
             world.AddComponent<TrafficPopulationSystem>();
             world.AddComponent<NPCScheduleSystem>();
             var wantedSystem = world.AddComponent<WantedSystem>();
@@ -160,6 +160,7 @@ namespace Vanta.EditorTools
             CreateDiscoveryPoints();
             CreateCivilians();
             CreateVehicles();
+            CreateTrafficRuntime(world.transform, trafficSystem, world.GetComponent<TrafficPopulationSystem>());
             navSurface.BuildNavMesh();
 
             CreateMissionRuntime(world.transform, mission);
@@ -387,6 +388,46 @@ namespace Vanta.EditorTools
                 go.transform.localScale = new Vector3(0.65f, 0.9f, 0.65f);
                 go.AddComponent<CivilianAI>();
                 go.AddComponent<VantaAgentBrain>();
+            }
+        }
+
+        private static void CreateTrafficRuntime(
+            Transform parent,
+            TrafficSystem trafficSystem,
+            TrafficPopulationSystem population)
+        {
+            var route = new TrafficRoute
+            {
+                routeId = "district_loop",
+                speedLimit = 10f,
+                points = new[]
+                {
+                    new Vector3(-34f, 0.9f, -34f),
+                    new Vector3(34f, 0.9f, -34f),
+                    new Vector3(34f, 0.9f, 34f),
+                    new Vector3(-34f, 0.9f, 34f)
+                }
+            };
+            trafficSystem.Register(route);
+
+            for (var i = 0; i < 6; i++)
+            {
+                var id = $"traffic_{i:00}";
+                if (population && !population.TrySpawn(id))
+                    continue;
+
+                var go = CreateCube(
+                    $"Traffic_{i:00}",
+                    parent,
+                    route.points[i % route.points.Length],
+                    new Vector3(1.8f, 0.8f, 3.2f),
+                    GetMaterial("Vehicle"));
+                var body = go.AddComponent<Rigidbody>();
+                body.mass = 1100f;
+                body.isKinematic = true;
+
+                var runtime = go.AddComponent<TrafficVehicleRuntime>();
+                runtime.Configure(trafficSystem, route.routeId);
             }
         }
 
