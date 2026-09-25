@@ -100,6 +100,7 @@ namespace Vanta.EditorTools
             world.AddComponent<IntelMapSystem>();
             world.AddComponent<PersistentWorldState>();
             var trafficSystem = world.AddComponent<TrafficSystem>();
+            var trafficSlots = world.AddComponent<TrafficSlotCoordinator>();
             world.AddComponent<TrafficPopulationSystem>();
             world.AddComponent<NPCScheduleSystem>();
             var wantedSystem = world.AddComponent<WantedSystem>();
@@ -109,7 +110,7 @@ namespace Vanta.EditorTools
             aiDirectorSo.FindProperty("worldEvents").objectReferenceValue = world.GetComponent<WorldEventSystem>();
             aiDirectorSo.ApplyModifiedPropertiesWithoutUndo();
             world.AddComponent<PoliceEscalationSystem>();
-            world.AddComponent<PolicePursuitCoordinator>();
+            var pursuitCoordinator = world.AddComponent<PolicePursuitCoordinator>();
             world.AddComponent<FactionSystem>();
             world.AddComponent<FactionTerritorySystem>();
             world.AddComponent<InventorySystem>();
@@ -157,6 +158,7 @@ namespace Vanta.EditorTools
             ConfigureWeapon(player.GetComponent<WeaponController>(), player.transform.Find("Muzzle"), camera.GetComponent<Camera>());
             CreateEnemy(player.transform);
             CreatePolice(player.transform, world.GetComponent<WantedSystem>());
+            CreatePolicePursuitVehicle(world.transform, player.transform, pursuitCoordinator, trafficSlots);
             CreateDiscoveryPoints();
             CreateCivilians();
             CreateVehicles();
@@ -279,6 +281,35 @@ namespace Vanta.EditorTools
             var so = new SerializedObject(ai);
             so.FindProperty("target").objectReferenceValue = player;
             so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void CreatePolicePursuitVehicle(
+            Transform parent,
+            Transform player,
+            PolicePursuitCoordinator coordinator,
+            TrafficSlotCoordinator trafficSlots)
+        {
+            var go = CreateCube(
+                "Police_PursuitVehicle",
+                parent,
+                new Vector3(34f, 0.9f, 30f),
+                new Vector3(2.2f, 0.9f, 4.2f),
+                GetMaterial("PoliceVehicle"));
+            var body = go.AddComponent<Rigidbody>();
+            body.mass = 1500f;
+            body.drag = 0.2f;
+            body.angularDrag = 0.5f;
+
+            var runtime = go.AddComponent<PolicePursuitVehicleRuntime>();
+            var runtimeSo = new SerializedObject(runtime);
+            runtimeSo.FindProperty("target").objectReferenceValue = player;
+            runtimeSo.FindProperty("trafficSlots").objectReferenceValue = trafficSlots;
+            runtimeSo.ApplyModifiedPropertiesWithoutUndo();
+
+            var coordinatorSo = new SerializedObject(coordinator);
+            coordinatorSo.FindProperty("target").objectReferenceValue = player;
+            coordinatorSo.FindProperty("pursuitVehicle").objectReferenceValue = runtime;
+            coordinatorSo.ApplyModifiedPropertiesWithoutUndo();
         }
 
         private static void CreatePolice(Transform player, WantedSystem wanted)
