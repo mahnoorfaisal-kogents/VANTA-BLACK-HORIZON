@@ -240,6 +240,7 @@ namespace Vanta.EditorTools
             go.AddComponent<GrappleTraversalSystem>();
             go.AddComponent<WorldInteractionInteractor>();
             go.AddComponent<MeleeCombatSystem>();
+            go.AddComponent<VehicleInteractor>();
 
             var health = go.AddComponent<Health>();
             var weapon = go.AddComponent<WeaponController>();
@@ -503,7 +504,13 @@ namespace Vanta.EditorTools
                 body.drag = 0.2f;
                 body.angularDrag = 0.5f;
                 go.AddComponent<VehicleController>();
-                go.AddComponent<VehicleInteraction>();
+                var interaction = go.AddComponent<VehicleInteraction>();
+                var seat = new GameObject("DriverSeat").transform;
+                seat.SetParent(go.transform);
+                seat.localPosition = new Vector3(0f, 0.9f, 0f);
+                var interactionSo = new SerializedObject(interaction);
+                interactionSo.FindProperty("seat").objectReferenceValue = seat;
+                interactionSo.ApplyModifiedPropertiesWithoutUndo();
             }
         }
 
