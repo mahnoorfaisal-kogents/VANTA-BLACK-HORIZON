@@ -20,6 +20,12 @@ namespace Vanta.Core
             DontDestroyOnLoad(gameObject);
         }
 
+        private void Start()
+        {
+            if (State == GameplayState.MainMenu)
+                StartGame();
+        }
+
         public bool StartGame() => SetState(GameplayState.Playing);
 
         public bool PauseGame()
