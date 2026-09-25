@@ -177,6 +177,9 @@ namespace Vanta.EditorTools
             var hudComponent = hud.AddComponent<VantaHud>();
             var hudSo = new SerializedObject(hudComponent);
             hudSo.FindProperty("playerHealth").objectReferenceValue = player.GetComponent<Health>();
+            hudSo.FindProperty("weapon").objectReferenceValue = player.GetComponent<WeaponController>();
+            hudSo.FindProperty("wanted").objectReferenceValue = world.GetComponent<WantedSystem>();
+            hudSo.FindProperty("interaction").objectReferenceValue = player.GetComponent<WorldInteractionInteractor>();
             hudSo.ApplyModifiedPropertiesWithoutUndo();
 
             var bootstrap = world.AddComponent<WorldBootstrap>();
